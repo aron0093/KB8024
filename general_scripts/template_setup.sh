@@ -14,7 +14,7 @@ read commands
 
 cd
 
-cd $path
+cd "$path"
 
 mkdir projects
 mkdir projects/scripts
