@@ -16,14 +16,15 @@ cd
 
 cd "$path"
 
-mkdir projects
-mkdir projects/scripts
-mkdir projects/bash
-echo '#!/bin/bash'> projects/bash/runall.sh
-mkdir projects/input
-mkdir projects/output
-echo $readme> projects/readme.txt
-echo $commands> projects/commands.txt
+mkdir project
+mkdir project/scripts
+mkdir project/bash
+echo '#!/bin/bash'> project/bash/runall.sh
+mkdir project/input
+mkdir project/output
+mkdir project/logs
+echo $readme> project/readme.txt
+echo $commands> project/commands.txt
 
 mkdir datatsets
 
