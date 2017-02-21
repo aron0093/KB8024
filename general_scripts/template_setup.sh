@@ -25,7 +25,7 @@ mkdir project/output
 mkdir project/logs
 echo $readme> project/readme.txt
 
-mkdir datatsets
+mkdir datat
 
 mkdir general_scripts
 
