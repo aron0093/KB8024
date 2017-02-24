@@ -16,7 +16,7 @@ X, Y = data_parser.sklearn_parser(filepath, window_size)
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 
-score = cross_val_score(SVC(), X, Y, cv=10)
+score = cross_val_score(SVC(kernel ='linear'), X, Y, cv=3)
 
 print(score)
 print("Accuracy: %0.2f (+/- %0.2f)" % (score.mean(), score.std() * 2))
