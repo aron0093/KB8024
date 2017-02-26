@@ -135,12 +135,8 @@ def skl_inp_gen(filepath, outpath, window_size, single_file=True):
 
         elif single_file==True:
             if i==0:
-                out1 = open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'w')
-                out2 = open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'w')
-                out1.close
-                out2.close
-                np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'a'), X)
-                np.savetxt(open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'a'), Y)
+                np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'w'), X)
+                np.savetxt(open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'w'), Y)
                 
             else:            
                 np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'a'), X)
