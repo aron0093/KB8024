@@ -48,7 +48,7 @@ def svmlight_input_gen_len3(filepath, outpath):
 
 #Stores data for each sequence in separate files at a designated location
 
-def sklearn_input_gen(filepath, outpath, window_size):
+def sklearn_input_gen(filepath, outpath, window_size, single_file=True):
     
     # Import data as a pandas dataframe and pivot it to wide form
 
@@ -122,15 +122,29 @@ def sklearn_input_gen(filepath, outpath, window_size):
             X[j-window_size] = np.array(temp_vector) 
             
         for m in range(0, len(data['Structure'][i])):
-            Y[m]= float(structure_dic[data['Structure'][i][m]])     
+            Y[m]= float(structure_dic[data['Structure'][i][m]])
 
-        out1 = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', 'w')
-        out2 = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', 'w')
-        out1.close
-        out2.close
-        np.savetxt(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', X)
-        np.savetxt(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', Y)
-        
+        if single_file==False:
+            
+            out1 = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', 'w')
+            out2 = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', 'w')
+            out1.close
+            out2.close
+            np.savetxt(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', X)
+            np.savetxt(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', Y)
+
+        elif single_file==True:
+            if i==0:
+                out1 = open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'w')
+                out2 = open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'w')
+                out1.close
+                out2.close
+                break
+            np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'a'), X)
+            np.savetxt(open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'a'), Y)
+            continue
+        else:
+            print("Specify output type as Single or Sequence(s) file")
     return
            
 
@@ -212,11 +226,12 @@ def sklearn_parser(filepath, window_size):
         for m in range(0, len(data['Structure'][i])):
             Y_[m]= float(structure_dic[data['Structure'][i][m]])
 
-        while i==0:
+        if i==0:
             X = X_
             Y = Y_
         else:
             X = np.concatenate((X,X_), axis=0)
             Y = np.concatenate((Y,Y_), axis=0)
-                
+            continue
+        
     return X, Y

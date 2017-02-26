@@ -7,9 +7,9 @@ Created on Tue Feb 21 21:00:20 2017
 
 import data_parser
 
-filepath = '''/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
+filepath = '''/KB8024/KB8024/data/globular_signal_tm_3state_slice.txt'''
 outpath = '''/KB8024/KB8024/SignalP/input/Window_3'''
-window_size = 2
+window_size = 3
 
 X, Y = data_parser.sklearn_parser(filepath, window_size)
 
