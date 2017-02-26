@@ -7,7 +7,7 @@ Created on Tue Feb 21 13:11:47 2017
 
 #Stores data as svmligh sparse format with window length 3 at designated location
 
-def svmlight_input_gen_len3(filepath, outpath):
+def svmL_inp_gen_len3(filepath, outpath):
 
     # Import data as a pandas dataframe and pivot it to wide form
     
@@ -48,7 +48,7 @@ def svmlight_input_gen_len3(filepath, outpath):
 
 #Stores data for each sequence in separate files at a designated location
 
-def sklearn_input_gen(filepath, outpath, window_size, single_file=True):
+def skl_inp_gen(filepath, outpath, window_size, single_file=True):
     
     # Import data as a pandas dataframe and pivot it to wide form
 
@@ -108,7 +108,7 @@ def sklearn_input_gen(filepath, outpath, window_size, single_file=True):
 
     for i in range(0,len(data['Sequence'])):
 
-        
+        # Using numpy arrays instead of lists to save memory.
         X = np.zeros([(len(data['Sequence'][i])-2*window_size),21*frame])
         Y = np.zeros(len(data['Structure'][i])) 
             
@@ -139,18 +139,21 @@ def sklearn_input_gen(filepath, outpath, window_size, single_file=True):
                 out2 = open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'w')
                 out1.close
                 out2.close
-                break
-            np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'a'), X)
-            np.savetxt(open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'a'), Y)
-            continue
+                np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'a'), X)
+                np.savetxt(open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'a'), Y)
+                
+            else:            
+                np.savetxt(open(outpath+'/'+str(window_size)+'_Vectors'+'.gz', 'a'), X)
+                np.savetxt(open(outpath+'/'+str(window_size)+'_Labels'+'.gz', 'a'), Y)
+            
         else:
-            print("Specify output type as Single or Sequence(s) file")
+            print("Specify output type as Single or Sequence-wise file(s)")
     return
            
 
 # Generates input arrays for sklearn
 
-def sklearn_parser(filepath, window_size):
+def skl_parser(filepath, window_size):
     
     # Import data as a pandas dataframe and pivot it to wide form
 
@@ -210,7 +213,7 @@ def sklearn_parser(filepath, window_size):
 
     for i in range(0,len(data['Sequence'])):
 
-        
+        # Using numpy arrays instead of lists to save memory.
         X_ = np.zeros([(len(data['Sequence'][i])-2*window_size),21*frame])
         Y_ = np.zeros(len(data['Structure'][i])) 
             
@@ -232,6 +235,5 @@ def sklearn_parser(filepath, window_size):
         else:
             X = np.concatenate((X,X_), axis=0)
             Y = np.concatenate((Y,Y_), axis=0)
-            continue
-        
+     
     return X, Y
