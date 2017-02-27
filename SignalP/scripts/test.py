@@ -6,16 +6,16 @@ Created on Tue Feb 21 21:00:20 2017
 """
 import SS_parser
 import MS_parser
-import cv_set_gen
+#import cv_set_gen
 
-filepath = '''\KB8024\KB8024\data\globular_signal_tm_3state_slice.txt'''
-outpath = '''\KB8024\KB8024\SignalP\input\Window_1/'''
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_slice.txt'''
+outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/Window_1/'''
 window_size = 1
 single_file = True
 K = 2
-db_address = ''
-inp_address = ''
-out_address = ''
+db_address = '/home/u2196/Desktop/KB8024/NCBI data/nr.gz'
+inp_address = '/home/u2196/Desktop/KB8024/KB8024/SignalP/input/'
+out_address = '/home/u2196/Desktop/KB8024/KB8024/SignalP/output/'
 
 MS_parser.pssm_gen(filepath, db_address, inp_address, out_address)
 
