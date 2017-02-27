@@ -71,7 +71,7 @@ def pssm_gen(filepath, db_address, inp_address, out_address):
     # Code to run PSIBLAST and generate PSSM
 
     from Bio.Blast.Applications import NcbipsiblastCommandline
-    #import subprocess
+    import subprocess
     
     raw_data = open(filepath, 'r')
     fasta_in = open(inp_address+'fasta_form.fasta', 'w')
@@ -81,14 +81,13 @@ def pssm_gen(filepath, db_address, inp_address, out_address):
         if (i+1) % 3 !=0:
             fasta_in.write(lines)
         
-    psi_cline = NcbipsiblastCommandline('psiblast', db = db_address, query = inp_address+'fasta_form.fasta', num_iterations = 4 , outfmt = 10, out_pssm = out_address+'pssm_out.csv', save_pssm_after_last_round=True)
+    psi_cline = NcbipsiblastCommandline('psiblast', db = db_address, query = inp_address+'fasta_form.fasta', num_iterations = 4 , outfmt = 10, out_pssm = out_address+'pssm_out.csv')
 
-    #p = subprocess.Popen(str(psi_cline),stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    #blastParser(p.stdout)
+    p = subprocess.Popen(str(psi_cline),shell=True)
+        
+    #str(psi_cline)
     
-    str(psi_cline)
-    
-    psi_cline()
+    #psi_cline()
     
     print("PSSM stored at %spssm_out"%(out_address))
     

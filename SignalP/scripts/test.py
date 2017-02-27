@@ -13,7 +13,7 @@ outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/Window_1/'''
 window_size = 1
 single_file = True
 K = 2
-db_address = '/home/u2196/Desktop/KB8024/NCBI data/nr.gz'
+db_address = '/local_uniref/uniref/uniref50/uniref50.db'
 inp_address = '/home/u2196/Desktop/KB8024/KB8024/SignalP/input/'
 out_address = '/home/u2196/Desktop/KB8024/KB8024/SignalP/output/'
 
