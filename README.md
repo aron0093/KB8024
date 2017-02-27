@@ -14,3 +14,5 @@ Part of the Master's course in Molecular Techniques in Life Science at Stockholm
 *	Extract the data from 50 other proteins and test the predictor.
 *	Analyse the results, compare previous results and also with the state of the art.
 *	Analyse performance compared to other ML methods.
+##FUNCTIONALITY:
+##OPERATIONALITY:
