@@ -37,76 +37,12 @@ def pre_vec_parser(filepath, window_size):
 
     return data
 
-#Stores data as svmligh sparse format with window length 3 at designated location
-
-def svmL_inp_gen_len3(filepath, outpath):
-
-    # Import data as a pandas dataframe and pivot it to wide form
-    
-    import pandas as pd
-    import re
-    
-    raw_data = pd.read_csv(filepath, header=None)
-    
-    headers = ['Title', 'Sequence', 'Structure']
-    new_index = []
-    for i in range(0,(int(len(raw_data[0])/3))):
-        new_index.extend([i,i,i])
-    
-    raw_data[1] = pd.Series(headers*(int(len(raw_data[0])/3)))
-    raw_data[2] = pd.Series(new_index)
-    
-    data = pd.DataFrame()
-    data = raw_data.pivot(index = 2, columns= 1, values = 0)
-    
-    # Create formatted input file
-    aa_dic = {'A':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7, 'I':8, 'K':9, 'L':10, 'M':11, 'N':12, 
-              'P':13, 'Q':14, 'R':15, 'S':16, 'T':17, 'U':18, 'V':19, 'W':20, 'Y':21 }
-    structure_dic = {'S':-1, 'M':1, 'G':0}
-    
-    for i in range(0,len(data['Sequence'])):
-        out = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'.txt', 'w')
-        out.close
-        out = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'.txt', 'a')
-        out.write('#'+str(aa_dic)[1:-1])
-        for j in range(0,(len(data['Sequence'][i])-2)):
-            qid = str(structure_dic[data['Structure'][i][j+1]])
-            aa_1 = str(aa_dic[data['Sequence'][i][j]])
-            aa_2 = str(aa_dic[data['Sequence'][i][j+1]])
-            aa_3 = str(aa_dic[data['Sequence'][i][j+2]])
-            out.write(qid+' '+aa_1+':1 '+aa_2+':1 '+aa_3+':1')
-        out.close
-    return
 
 #Stores data for each sequence in separate files at a designated location
 
 def skl_inp_gen(filepath, outpath, window_size, single_file=True):
     
-    # Import data as a pandas dataframe and pivot it to wide form
-
-    import pandas as pd
-    import numpy as np
-    import re
-
-    raw_data = pd.read_csv(filepath, header=None)
-
-    headers = ['Title', 'Sequence', 'Structure']
-    new_index = []
-    for i in range(0,(int(len(raw_data[0])/3))):
-        new_index.extend([i,i,i])
-
-    raw_data[1] = pd.Series(headers*(int(len(raw_data[0])/3)))
-    raw_data[2] = pd.Series(new_index)
-
-    data = pd.DataFrame()
-    data = raw_data.pivot(index = 2, columns= 1, values = 0)
-
-    pre_suf = ['B']*window_size
-
-    # Use ''.join for efficiency instead of +. Also use nested loops instead of storing variables.
-
-    for i in range(0,len(data['Sequence'])):
-        data['Sequence'][i] = ''.join([''.join(pre_suf), data['Sequence'][i], ''.join(pre_suf)])
+    data = pre_vec_parser(filepath, window_size)
 
     # Create formatted input file
 
@@ -183,31 +119,7 @@ def skl_inp_gen(filepath, outpath, window_size, single_file=True):
 
 def skl_parser(filepath, window_size):
     
-    # Import data as a pandas dataframe and pivot it to wide form
-
-    import pandas as pd
-    import numpy as np
-    import re
-
-    raw_data = pd.read_csv(filepath, header=None)
-
-    headers = ['Title', 'Sequence', 'Structure']
-    new_index = []
-    for i in range(0,(int(len(raw_data[0])/3))):
-        new_index.extend([i,i,i])
-
-    raw_data[1] = pd.Series(headers*(int(len(raw_data[0])/3)))
-    raw_data[2] = pd.Series(new_index)
-
-    data = pd.DataFrame()
-    data = raw_data.pivot(index = 2, columns= 1, values = 0)
-
-    pre_suf = ['B']*window_size
-
-    # Use ''.join for efficiency instead of +. Also use nested loops instead of storing variables.
-
-    for i in range(0,len(data['Sequence'])):
-        data['Sequence'][i] = ''.join([''.join(pre_suf), data['Sequence'][i], ''.join(pre_suf)])
+    data = pre_vec_parser(filepath, window_size)
 
     # Create formatted input file
 
@@ -265,3 +177,45 @@ def skl_parser(filepath, window_size):
             Y = np.concatenate((Y,Y_), axis=0)
      
     return X, Y
+
+#Stores data as svmligh sparse format with window length 3 at designated location
+
+def svmL_inp_gen_len3(filepath, outpath):
+
+    # Import data as a pandas dataframe and pivot it to wide form
+    
+    import pandas as pd
+    import re
+    
+    raw_data = pd.read_csv(filepath, header=None)
+    
+    headers = ['Title', 'Sequence', 'Structure']
+    new_index = []
+    for i in range(0,(int(len(raw_data[0])/3))):
+        new_index.extend([i,i,i])
+    
+    raw_data[1] = pd.Series(headers*(int(len(raw_data[0])/3)))
+    raw_data[2] = pd.Series(new_index)
+    
+    data = pd.DataFrame()
+    data = raw_data.pivot(index = 2, columns= 1, values = 0)
+    
+    # Create formatted input file
+    aa_dic = {'A':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7, 'I':8, 'K':9, 'L':10, 'M':11, 'N':12, 
+              'P':13, 'Q':14, 'R':15, 'S':16, 'T':17, 'U':18, 'V':19, 'W':20, 'Y':21 }
+    structure_dic = {'S':-1, 'M':1, 'G':0}
+    
+    for i in range(0,len(data['Sequence'])):
+        out = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'.txt', 'w')
+        out.close
+        out = open(outpath+'/'+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'.txt', 'a')
+        out.write('#'+str(aa_dic)[1:-1])
+        for j in range(0,(len(data['Sequence'][i])-2)):
+            qid = str(structure_dic[data['Structure'][i][j+1]])
+            aa_1 = str(aa_dic[data['Sequence'][i][j]])
+            aa_2 = str(aa_dic[data['Sequence'][i][j+1]])
+            aa_3 = str(aa_dic[data['Sequence'][i][j+2]])
+            out.write(qid+' '+aa_1+':1 '+aa_2+':1 '+aa_3+':1')
+        out.close
+    return
+
