@@ -39,7 +39,9 @@ def pre_vec_parser(filepath, window_size):
 
 
 
-def pssm_gen(Sequence, db_address):
+def pssm_gen(filepath, db_address, inp_address, out_address):
+
+       
     # Default dictionary
     
     aa_dic = {  'A':[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -68,15 +70,22 @@ def pssm_gen(Sequence, db_address):
 
     # Code to run PSIBLAST and generate PSSM
 
-    from Bio.Seq import Seq
-    from Bio.Alphabet import generic_protein
     from Bio.Blast.Applications import NcbipsiblastCommandline
     
-    seq_ = Seq(Sequence, generic_protein)
-    cline = NcbipsiblastCommandline(db = db_address,\
-                                        query = seq_, evalue =  10 ,                                        , outfmt = 7, \
-                                        out_pssm = queryID+"_pssm")
+    raw_data = open(filepath, 'r')
+    fasta_in = open(inp_address+'fasta_form.fasta', 'w')
+    fasta_out = open(out_address+'pssm_out', 'w')
     
+    for i, lines in enumerate(raw_data.readlines()):
+        if (i+1) % 3 !=0:
+            fasta_in.write(lines)
+        
+    cline = NcbipsiblastCommandline(db = db_address,\
+                                        query = inp_address+'fasta_form.fasta', evalue =  10 , outfmt = 7,\
+                                        out_pssm = out_address+'pssm_out')
+
+    return print("PSSM stored at %spssm_out"%(out_address))
+
     # Replace default dic with pssm
     
     for vect in pssm:
@@ -102,7 +111,7 @@ def skl_pssm_parser(filepath, window_size):
 
         # Generating pssm dictionary
 
-        aa_dic = pssm_gen(data['Sequence'][i])
+        ######aa_dic = pssm_gen(data['Sequence'][i])#####
 
         # Using numpy arrays instead of lists to save memory.
         X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
@@ -146,7 +155,7 @@ def skl_pssm_inp_gen(filepath, outpath, window_size, single_file=True):
 
         # Generating pssm dictionary
 
-        aa_dic = pssm_gen(data['Sequence'][i])
+        #####aa_dic = pssm_gen(data['Sequence'][i])#####
 
         # Using numpy arrays instead of lists to save memory.
         X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
