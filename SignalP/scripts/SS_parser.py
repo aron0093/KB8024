@@ -5,6 +5,38 @@ Created on Tue Feb 21 13:11:47 2017
 @author: Revant Gupta
 """
 
+#Input raw data and window_size and store pre vectorised data as pandas Dataframe
+
+def pre_vec_parser(filepath, window_size):
+    
+    # Import data as a pandas dataframe and pivot it to wide form
+
+    import pandas as pd
+    import numpy as np
+    import re
+
+    raw_data = pd.read_csv(filepath, header=None)
+
+    headers = ['Title', 'Sequence', 'Structure']
+    new_index = []
+    for i in range(0,(int(len(raw_data[0])/3))):
+        new_index.extend([i,i,i])
+
+    raw_data[1] = pd.Series(headers*(int(len(raw_data[0])/3)))
+    raw_data[2] = pd.Series(new_index)
+
+    data = pd.DataFrame()
+    data = raw_data.pivot(index = 2, columns= 1, values = 0)
+
+    pre_suf = ['B']*window_size
+
+    # Use ''.join for efficiency instead of +. Also use nested loops instead of storing variables.
+
+    for i in range(0,len(data['Sequence'])):
+        data['Sequence_windowed'][i] = ''.join([''.join(pre_suf), data['Sequence'][i], ''.join(pre_suf)])
+
+    return data
+
 #Stores data as svmligh sparse format with window length 3 at designated location
 
 def svmL_inp_gen_len3(filepath, outpath):
