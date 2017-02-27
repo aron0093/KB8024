@@ -8,8 +8,8 @@ import SS_parser
 import MS_parser
 import cv_set_gen
 
-filepath = '''C:\Users\Goodbaccha\Desktop\Masters\Semesters\Spring 17\KB8024\KB8024\data\globular_signal_tm_3state_slice.txt'''
-outpath = '''C:\Users\Goodbaccha\Desktop\Masters\Semesters\Spring 17\KB8024\KB8024\SignalP\input\Window_1/'''
+filepath = '''\KB8024\KB8024\data\globular_signal_tm_3state_slice.txt'''
+outpath = '''\KB8024\KB8024\SignalP\input\Window_1/'''
 window_size = 1
 single_file = True
 K = 2
