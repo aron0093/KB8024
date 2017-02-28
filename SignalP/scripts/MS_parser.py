@@ -38,8 +38,9 @@ def pre_vec_parser(filepath, window_size):
     return data
 
 
-
-def pssm_gen(filepath, db_address, inp_address, out_address):
+ # Function to generate PSSM
+ 
+def pssm_gen(filepath, db_address, inp_address, out_address, num_iter, num_thr):
 
        
     # Default dictionary
@@ -70,35 +71,29 @@ def pssm_gen(filepath, db_address, inp_address, out_address):
 
     # Code to run PSIBLAST and generate PSSM
 
-    from Bio.Blast.Applications import NcbipsiblastCommandline
-    import subprocess
-    
     raw_data = open(filepath, 'r')
     fasta_in = open(inp_address+'fasta_form.fasta', 'w')
-    fasta_out = open(out_address+'pssm_out.csv', 'w')
-    
+       
     for i, lines in enumerate(raw_data.readlines()):
         if (i+1) % 3 !=0:
             fasta_in.write(lines)
+            
+    from Bio.Blast.Applications import NcbipsiblastCommandline
+    from Bio.Blast import NCBIXML
         
-    psi_cline = NcbipsiblastCommandline('psiblast', db = db_address, query = inp_address+'fasta_form.fasta', num_iterations = 4 , outfmt = 10, out_pssm = out_address+'pssm_out.csv')
-
-    p = subprocess.Popen(str(psi_cline),shell=True)
+    global psi_cline
         
+    psi_cline = NcbipsiblastCommandline('psiblast', db = db_address, query = inp_address+'fasta_form.fasta', num_threads = num_thr, num_iterations = num_iter , outfmt = 5, out_ascii_pssm = out_address+'pssm_out.xml')
+       
     #str(psi_cline)
     
-    #psi_cline()
-    
-    print("PSSM stored at %spssm_out"%(out_address))
-    
-    return 
+    psi_cline()
+            
+    print("PSSM will be stored at %spssm_out"%(out_address)) 
+            
+    return
 
-    # Replace default dic with pssm
-    
-    for vect in pssm:
-        for aa in aa_list[:-1]:
-            aa_dic[aa] = list(vect)
-    return aa_dic    
+
 
 # Generates input arrays for sklearn
 
@@ -120,7 +115,7 @@ def skl_pssm_parser(filepath, window_size):
 
     for i in range(0,len(data['Sequence'])):
 
-        # Create vector dictionary from PSSM
+        ######## Create vector dictionary from PSSM
 
         # Using numpy arrays instead of lists to save memory.
         X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
@@ -169,7 +164,7 @@ def skl_pssm_inp_gen(filepath, outpath, window_size, single_file=True):
 
     for i in range(0,len(data['Sequence'])):
 
-        # Create vector dictionary from PSSM
+        ########## Create vector dictionary from PSSM
 
         # Using numpy arrays instead of lists to save memory.
         X = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
