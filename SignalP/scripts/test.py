@@ -24,7 +24,7 @@ num_thr = 8
 
 start = time.time()
 
-MS_parser.pssm_gen(filepath, db_address, inp_address, out_address, num_iter, num_thr)
+MS_parser.pssm_add(filepath, db_address, inp_address, out_address, num_iter, num_thr)
 
 #p = subprocess.Popen(str(psi_cline),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
 #def bb(db_address, inp_address, out_address, num_iter, num_thr):

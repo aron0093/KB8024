@@ -192,6 +192,117 @@ def skl_parser(filepath, window_size):
      
     return X, Y
 
+# Generates input arrays for sklearn using pssm.
+    
+def skl_pssm_parser(filepath, window_size,pssm_list):
+
+    import numpy as np
+    import re
+
+    # Import data as a pandas dataframe and pivot it to wide form
+    
+    data = pre_vec_parser(filepath, window_size)
+
+    # Create formatted input file
+
+    structure_dic = {'S':-1, 'M':1, 'G':0}
+
+    frame = (2*window_size)+1
+    # Creating separate files for each peptide to avoid working with entire data     
+
+    for i in range(0,len(data['Sequence'])):
+
+        ######## Create vector dictionary from PSSM
+
+        # Using numpy arrays instead of lists to save memory.
+        X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
+        Y_ = np.zeros(len(data['Structure'][i])) 
+            
+        for j in range(window_size, (len(data['Sequence_windowed'][i])-window_size)):
+
+            temp_vector = list()
+            
+            for a in [aa_dic[data['Sequence_windowed'][i][k]] for k in range(j-window_size, j+window_size+1)]: 
+                temp_vector.extend(a)
+
+            X_[j-window_size] = np.array(temp_vector) 
+            
+        for m in range(0, len(data['Structure'][i])):
+            Y_[m]= float(structure_dic[data['Structure'][i][m]])
+
+        assert len(X_) == len(Y_)
+
+        if i==0:
+            X = X_
+            Y = Y_
+        else:
+            X = np.concatenate((X,X_), axis=0)
+            Y = np.concatenate((Y,Y_), axis=0)
+     
+    return X, Y
+
+# Generates input arrays for sklearn using pssm.
+
+def skl_pssm_inp_gen(filepath, outpath, window_size,pssm_list, single_file=True):
+
+    import numpy as np
+    import re
+
+    # Import data as a pandas dataframe and pivot it to wide form
+    
+    data = pre_vec_parser(filepath, window_size)
+
+    # Create formatted input file
+
+    structure_dic = {'S':-1, 'M':1, 'G':0}
+
+    frame = (2*window_size)+1
+    # Creating separate files for each peptide to avoid working with entire data     
+
+    for i in range(0,len(data['Sequence'])):
+
+        ########## Create vector dictionary from PSSM
+
+        # Using numpy arrays instead of lists to save memory.
+        X = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
+        Y = np.zeros(len(data['Structure'][i])) 
+            
+        for j in range(window_size, (len(data['Sequence_windowed'][i])-window_size)):
+
+            temp_vector = list()
+         
+            for a in [aa_dic[data['Sequence_windowed'][i][k]] for k in range(j-window_size, j+window_size+1)]: 
+                temp_vector.extend(a)
+
+            X[j-window_size] = np.array(temp_vector) 
+            
+        for m in range(0, len(data['Structure'][i])):
+            Y[m]= float(structure_dic[data['Structure'][i][m]])
+
+        assert len(X) == len(Y)
+
+        if single_file==False:
+            
+            out1 = open(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', 'w')
+            out2 = open(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', 'w')
+            out1.close
+            out2.close
+            np.savetxt(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', X)
+            np.savetxt(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', Y)
+
+        elif single_file==True:
+            if i==0:
+                np.savetxt(open(outpath+str(window_size)+'_Vectors'+'.gz', 'w'), X)
+                np.savetxt(open(outpath+str(window_size)+'_Labels'+'.gz', 'w'), Y)
+                
+            else:            
+                np.savetxt(open(outpath+str(window_size)+'_Vectors'+'.gz', 'a'), X)
+                np.savetxt(open(outpath+str(window_size)+'_Labels'+'.gz', 'a'), Y)
+            
+        else:
+            print("Specify output type as Single or Sequence-wise file(s)")
+    return
+           
 #Stores data as svmligh sparse format with window length 3 at designated location
 
 def svmL_inp_gen_len3(filepath, outpath):
@@ -232,4 +343,6 @@ def svmL_inp_gen_len3(filepath, outpath):
             out.write(qid+' '+aa_1+':1 '+aa_2+':1 '+aa_3+':1')
         out.close
     return
+    
+
 
