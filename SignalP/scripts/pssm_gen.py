@@ -5,62 +5,129 @@ Created on Tue Feb 21 13:11:47 2017
 @author: Revant Gupta
 """
 
+# Function to divide raw data into n parts. Should I generalise? Not required for the project!
+
+def data_divide(filepath, outpath, divisions):
+    
+    
+    import pandas as pd
+
+    raw_data = pd.read_csv(filepath, header=None)
+    
+    prot_count = len(raw_data)/3
+    
+    if  prot_count % divisions == 0:
+    
+        i = 0
+        
+        for k in range(divisions):
+            temp = raw_data[(int(i*(len(raw_data)/divisions))): int(((i+1)*(len(raw_data)/divisions)))]
+            temp.to_csv(outpath+'raw_data_'+str(k+1)+'.txt')  
+            i =+ 1
+    
+    else:
+        
+        i = 0
+        
+        residue = 3*(prot_count % divisions)
+
+        for k in range(divisions):
+
+            if (k+1) == divisions:
+                temp = raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))]+raw_data[int(-residue):]
+            else:
+                temp = raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))]
+            temp.to_csv(outpath+'raw_data_'+str(k+1)+'.txt', header=False, index =False)  
+            i =+ 1
+
+    return
+    
+
 # Function to generate PSSM
  
-def pssm_gen(database, input_fasta, out_pssm, num_iter, num_thr):
+def pssm_gen_ncbi(database, input_fasta, out_pssm, num_iter, num_thr):
 
     from Bio.Blast.Applications import NcbipsiblastCommandline
     
     psi_cline = NcbipsiblastCommandline('psiblast', db = database, query = inp_fasta, num_threads = num_thr, num_iterations = num_iter , outfmt = 5, out_ascii_pssm = out_pssm)
     psi_cline()
-    return out
- 
-def pssm_add(filepath, db_address, inp_address, out_address, num_iter, num_thr):
-       
-    # Default dictionary
     
-    aa_dic = {  'A':[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                'C':[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], 
-                'D':[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                'E':[0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                'F':[0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                'G':[0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], 
-                'H':[0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0], 
-                'I':[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                'K':[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
-                'L':[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
-                'M':[0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
-                'N':[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
-                'P':[0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
-                'Q':[0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
-                'R':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
-                'S':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
-                'T':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
-                'V':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
-                'W':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
-                'Y':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-                'B':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }
-
-    aa_list = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', 'B']
-
-    # Code to run PSIBLAST and generate PSSM
-
-    raw_data = open(filepath, 'r')
-    fasta_in = open(inp_address+'fasta_form.fasta', 'w')
-       
-    for i, lines in enumerate(raw_data.readlines()):
-        if (i+1) % 3 !=0:
-            fasta_in.write(lines)
-            
-    from Bio.Blast import NCBIXML
-    
-        
-    pssm_gen(db_address, inp_address, out_address, num_iter, num_thr)
-       
-    print("PSSM will be stored at %spssm_out"%(out_address)) 
-            
     return
 
+# Function to execute psiblast over multiple servers
+    
+def pssm_gen_ssh(database, server_list, file_list, outpath, username, password):
+    
+    import paramiko
+    import os
+    import time
+    
+    for i in range(len(file_list)):
+    
+        server = server_list[i]
+        query_text = 'psiblast -db '+database+' -query '+file_list[i]+' -num_threads 4 -num_iterations 4 -outfmt 5 -out_ascii_pssm '+outpath+'pssm_'+str(i+1)+'.xml.'
+    
+        # Running the queries over ssh
+        
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        #In case the server's key is unknown, we will be adding it automatically to the list of known hosts.
+        
+        ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
+        
+        #Loads the user's local known host file.
+        
+        print("Connecting to server: ", server)
+        
+        ssh.connect(server, username=username, password=password)
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(query_text)
+        ssh_stdin.close()
+        
+        time.sleep(1)
+        #session = ssh.invoke_shell()
+        #session.send("\n")
 
+        #session.send(query_text+"\n")
+        
+        #print ("output", ssh_stdout.read()) #Reading output of the executed command
+        #error = ssh_stderr.read()
+        
+        #Reading the error stream of the executed command
+        #print ("err", error, len(error))
 
+    return
 
+# Purge processes on multiple servers
+
+def process_purge(server_list, username, password):
+    
+    import paramiko
+    import os
+    import time
+     
+    for i in range(len(server_list)):
+    
+        server = server_list[i]
+        e_mc_2 = 'pkill -u '+username 
+    
+        # Running the queries over ssh
+        
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        #In case the server's key is unknown, we will be adding it automatically to the list of known hosts.
+        
+        ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
+        
+        #Loads the user's local known host file.
+        
+        print("Purging processes on: ", server)
+        
+        ssh.connect(server, username=username, password=password)
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(e_mc_2)
+        ssh_stdin.close()
+        
+        time.sleep(1)
+        
+    return

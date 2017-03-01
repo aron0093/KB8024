@@ -4,27 +4,40 @@ Created on Tue Feb 21 21:00:20 2017
 
 @author: Revant
 """
-import SS_parser
-import MS_parser
+import dense_data_parser
 #import cv_set_gen
+import pssm_gen
 from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
 import time
+import paramiko
+import os
 
-filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_single.txt'''
+# data_parsing + general
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/Window_1/'''
 window_size = 1
 single_file = True
+
+#cv_set_gen
 K = 2
+
+# pssm_gen
 db_address = '/local_uniref/uniref/uniref50/uniref50.db'
 inp_address = '/home/u2196/Desktop/KB8024/KB8024/SignalP/input/'
 out_address = '/home/u2196/Desktop/KB8024/KB8024/SignalP/output/'
 num_iter = 4
 num_thr = 8
 
+# data_divide for pssm
+pssm_split_loc = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
+divisions = 20
+
 start = time.time()
 
-MS_parser.pssm_add(filepath, db_address, inp_address, out_address, num_iter, num_thr)
+
+
+#pssm_gen.data_divide(filepath, pssm_split_loc, divisions)
 
 #p = subprocess.Popen(str(psi_cline),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
 #def bb(db_address, inp_address, out_address, num_iter, num_thr):

@@ -12,6 +12,8 @@
 
 	-dense_data_parser: Functions to extract data from raw file, return numpy arrays to be used as input for sklearn svm. Sequence vectors and labels are returned in separate arrays. Vectorsisation can be either pssm based or single sequence.
 	-cv_set_gen: Function to generate cross validation sets. Currently not used as sklearn.cross_val_score is prefered.
+	-pssm_gen: Contains functions to generate pssm using psiblast on local.
+	-pssm_ssh: Script to run psiblast by dividing data and executing on all computers.
 	-cross_val_score: Scoring various SVM categories.
 	-run_all: Final script to process data and build the model.
 	-test: staging area for testing WIP code.

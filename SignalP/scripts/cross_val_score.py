@@ -5,7 +5,7 @@ Created on Tue Feb 21 21:00:20 2017
 @author: Revant
 """
 
-import SS_parser
+import dense_data_parser
 import time
 import numpy as np
 from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
@@ -19,7 +19,7 @@ window_size = 3
 
 print("Parsing data...")
 
-X, Y = SS_parser.skl_parser(filepath, window_size)
+X, Y = dense_data_parser.skl_parser(filepath, window_size)
 
 
 print("Scoring over cross validation sets...")
