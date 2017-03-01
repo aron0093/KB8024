@@ -10,15 +10,15 @@ import time
 
 # pssm_ssh
 
-outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/pssms/'''
+outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/pssms/all/'''
 database = '/local_uniref/uniref/uniref50/uniref50.db'
 username = 'u2196'
-password = 'Aim7ete9g'
+password = ''
 num_list = ['01', '02', '03', '04', '05', '06', '07', '08', '10', '11', '13', '14', '17', '18', '19', '20', '21', '24', '26', '27', '29', '30', '32', '33', '34', '35', '36', '37']
 
 # data_divide for pssm
 
-filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_30_slice.txt'''
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 pssm_split_loc = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
 divisions = len(num_list)
 

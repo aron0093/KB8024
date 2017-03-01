@@ -14,7 +14,18 @@ def data_divide(filepath, outpath, divisions):
 
     raw_data = pd.read_csv(filepath, header=None)
     
-    prot_count = len(raw_data)/3
+    drop_list = []
+    
+    for l in range(len(raw_data)):
+        if (l+1) % 3 == 0:
+            drop_list.extend([l])
+    
+        
+            
+    raw_data.drop(raw_data.index[drop_list], inplace=True)
+    raw_data.reset_index(drop = True, inplace = True)
+    
+    prot_count = len(raw_data)/2
     
     if  prot_count % divisions == 0:
     
@@ -29,17 +40,17 @@ def data_divide(filepath, outpath, divisions):
         
         i = 0
         
-        residue = 3*(prot_count % divisions)
+        residue = 2*(prot_count % divisions)
 
         for k in range(divisions):
 
             if (k+1) == divisions:
-                temp = raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))]+raw_data[int(-residue):]
+                temp = pd.concat([raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))], raw_data[int(-residue):]], ignore_index =True)
             else:
                 temp = raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))]
             temp.to_csv(outpath+'raw_data_'+str(k+1)+'.txt', header=False, index =False)  
-            i =+ 1
-
+            i += 1
+            
     return
     
 
@@ -65,7 +76,7 @@ def pssm_gen_ssh(database, server_list, file_list, outpath, username, password):
     for i in range(len(file_list)):
     
         server = server_list[i]
-        query_text = 'psiblast -db '+database+' -query '+file_list[i]+' -num_threads 4 -num_iterations 4 -outfmt 5 -out_ascii_pssm '+outpath+'pssm_'+str(i+1)+'.xml.'
+        query_text = 'psiblast -db '+database+' -query '+file_list[i]+' -num_threads 4 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'pssm_'+str(i+1)+'.csv'
     
         # Running the queries over ssh
         

@@ -14,8 +14,8 @@ import paramiko
 import os
 
 # data_parsing + general
-filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
-outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/Window_1/'''
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_30_slice.txt'''
+#outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/Window_1/'''
 window_size = 1
 single_file = True
 
@@ -30,8 +30,8 @@ num_iter = 4
 num_thr = 8
 
 # data_divide for pssm
-pssm_split_loc = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
-divisions = 20
+outpath = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
+divisions = 28
 
 start = time.time()
 
