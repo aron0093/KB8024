@@ -16,12 +16,28 @@ from sklearn.model_selection import cross_val_score
 
 filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 window_size = 3
+K = 5
 
 print("Parsing data...")
 
-X, Y = dense_data_parser.skl_parser(filepath, window_size)
+data = dense_data_parser.pre_vec_parser(filepath, window_size)
+
+X, Y = dense_data_parser.skl_parser(data)
+
+clf = LinearSVC(class_weight = 'balanced')
+scores = []
+
+for a,b,c,d in cv_set_gen.cv_set_gen(X, Y, K, randomise=False):
+    clf.fit(a,c)
+    score = clf.score(b,d)
+    scores.append(score)    
+print(scores)
 
 
+
+
+
+'''
 print("Scoring over cross validation sets...")
 
 start = time.time()
@@ -61,6 +77,6 @@ clf.fit(X, Y)
 end = time.time()
 print ("Random Forest", end - start, clf.score(X,Y))
 proba = clf.predict_proba(X)
-
+'''
 
 

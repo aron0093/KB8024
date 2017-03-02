@@ -5,7 +5,6 @@ Created on Tue Feb 21 21:00:20 2017
 @author: Revant
 """
 import dense_data_parser
-#import cv_set_gen
 import pssm_gen
 from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
@@ -20,7 +19,7 @@ window_size = 1
 single_file = True
 
 #cv_set_gen
-K = 2
+K = 5
 
 # pssm_gen
 db_address = '/local_uniref/uniref/uniref50/uniref50.db'
@@ -31,10 +30,9 @@ num_thr = 8
 
 # data_divide for pssm
 outpath = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
-divisions = 28
+#divisions = 28
 
 start = time.time()
-
 
 
 #pssm_gen.data_divide(filepath, pssm_split_loc, divisions)
@@ -46,10 +44,15 @@ start = time.time()
 #    return
     
 #bb(db_address, inp_address, out_address, num_iter, num_thr)
-#X, Y = SS_parser.skl_parser(filepath, window_size)
+#data = dense_data_parser.pre_vec_parser(filepath, window_size)
 
-#for a,b,c,d in cv_set_gen.cv_set_gen(X, Y, K, randomise=False):
-#    print(len(a), len(b), len(c), len(d))
+#for a, b in dense_data_parser.cv_data_gen(data, 5, randomise=False):
+#    print(len(a), len(b))
+
+#X, Y = dense_data_parser.skl_parser(data)
+
+#####for a,b,c,d in cv_set_gen.cv_set_gen(X, Y, K, randomise=False):
+#####    print(len(a), len(b), len(c), len(d))
 
 end = time.time()
 

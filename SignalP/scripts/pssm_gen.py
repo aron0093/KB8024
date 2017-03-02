@@ -11,6 +11,7 @@ def data_divide(filepath, outpath, divisions):
     
     
     import pandas as pd
+    import os
 
     raw_data = pd.read_csv(filepath, header=None)
     
@@ -33,7 +34,13 @@ def data_divide(filepath, outpath, divisions):
         
         for k in range(divisions):
             temp = raw_data[(int(i*(len(raw_data)/divisions))): int(((i+1)*(len(raw_data)/divisions)))]
-            temp.to_csv(outpath+'raw_data_'+str(k+1)+'.txt')  
+            try: 
+                os.makedirs(outpath + 'raw_data_'+str(k+1)+'/')
+            except OSError:
+                if not os.path.isdir(outpath + 'raw_data_'+str(k+1)+'/'):
+                    raise
+            for s in range(0,len(temp),2):
+                temp.iloc[s:s+2].to_csv(outpath+'raw_data_'+str(k+1)+'/'+str(temp.iloc[s].to_string(index=False, header=False))+'.txt', index=False, header=None)  
             i =+ 1
     
     else:
@@ -48,7 +55,13 @@ def data_divide(filepath, outpath, divisions):
                 temp = pd.concat([raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))], raw_data[int(-residue):]], ignore_index =True)
             else:
                 temp = raw_data[(int(i*((len(raw_data)-residue)/divisions))): int(((i+1)*((len(raw_data)-residue)/divisions)))]
-            temp.to_csv(outpath+'raw_data_'+str(k+1)+'.txt', header=False, index =False)  
+            try: 
+                os.makedirs(outpath + 'raw_data_'+str(k+1)+'/')
+            except OSError:
+                if not os.path.isdir(outpath + 'raw_data_'+str(k+1)+'/'):
+                    raise
+            for s in range(0,len(temp),2):
+                temp.iloc[s:s+2].to_csv(outpath+'raw_data_'+str(k+1)+'/'+str(temp.iloc[s].to_string(index=False, header=False))+'.txt', index=False, header=None)  
             i += 1
             
     return
@@ -67,16 +80,30 @@ def pssm_gen_ncbi(database, input_fasta, out_pssm, num_iter, num_thr):
 
 # Function to execute psiblast over multiple servers
     
-def pssm_gen_ssh(database, server_list, file_list, outpath, username, password):
+def pssm_gen_ssh(database, server_list, file_loc, outpath, username, password_loc):
     
     import paramiko
     import os
     import time
+    import re
     
-    for i in range(len(file_list)):
+    password = (open(password_loc, 'r').read()).replace('\n','')
+        
+    for i in range(len(file_loc)):
     
         server = server_list[i]
-        query_text = 'psiblast -db '+database+' -query '+file_list[i]+' -num_threads 4 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'pssm_'+str(i+1)+'.csv'
+        
+        script = open(file_loc[i]+'script.sh','w')
+        
+        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 4 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'${files#*>}_'+str(i+1)+'.csv'+'\n'+'done')
+        
+        script.close()
+  
+        #query_text_a= 'chmod 755'+file_loc[i]+'script.sh'
+        query_text= 'bash '+file_loc[i][12:]+'script.sh'
+        #print(query_text)
+       
+        #query_text = 'psiblast -db '+database+' -query '+file_list[i]+' -num_threads 4 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'pssm_'+str(i+1)+'.csv'
     
         # Running the queries over ssh
         
@@ -92,6 +119,8 @@ def pssm_gen_ssh(database, server_list, file_list, outpath, username, password):
         print("Connecting to server: ", server)
         
         ssh.connect(server, username=username, password=password)
+          
+        #ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(query_text_a)
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(query_text)
         ssh_stdin.close()
         
@@ -111,11 +140,14 @@ def pssm_gen_ssh(database, server_list, file_list, outpath, username, password):
 
 # Purge processes on multiple servers
 
-def process_purge(server_list, username, password):
+def process_purge(server_list, username, password_loc):
     
     import paramiko
     import os
     import time
+    
+    password = (open(password_loc, 'r').read()).replace('\n','')
+    
      
     for i in range(len(server_list)):
     

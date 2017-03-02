@@ -38,6 +38,27 @@ def pre_vec_parser(filepath, window_size):
     return data
 
 
+def cv_data_gen(data, K, randomise=False):
+
+    import pandas as pd
+    import numpy as np
+    from sklearn.utils import shuffle
+
+    if randomise:
+        data = shuffle(data)
+        
+    else:
+        print("Data is not shuffled")
+        
+    splits = np.array_split(data, K)
+                         
+    for k in range(K):
+        train_sets = [item for i,item in enumerate(splits) if i!=k ]
+        train_data = pd.concat(train_sets)
+        test_data = splits[k]     
+        
+        yield train_data, test_data
+
 #Stores data for each sequence in separate files at a designated location
 
 def skl_inp_gen(filepath, outpath, window_size, single_file=True):
@@ -124,14 +145,15 @@ def skl_inp_gen(filepath, outpath, window_size, single_file=True):
 
 # Generates input arrays for sklearn
 
-def skl_parser(filepath, window_size):
+def skl_parser(data):
 
     import numpy as np
+    import pandas as pd
     import re
-
-    # Import data as a pandas dataframe and pivot it to wide form
     
-    data = pre_vec_parser(filepath, window_size)
+    
+    
+    
 
     # Create formatted input file
 
@@ -194,14 +216,13 @@ def skl_parser(filepath, window_size):
 
 # Generates input arrays for sklearn using pssm.
     
-def skl_pssm_parser(filepath, window_size,pssm_list):
+def skl_pssm_parser(data,pssm_list):
 
     import numpy as np
+    import pandas as pd
     import re
 
-    # Import data as a pandas dataframe and pivot it to wide form
-    
-    data = pre_vec_parser(filepath, window_size)
+
 
     # Create formatted input file
 
