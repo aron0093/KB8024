@@ -95,7 +95,7 @@ def pssm_gen_ssh(database, server_list, file_loc, outpath, username, password_lo
         
         script = open(file_loc[i]+'script.sh','w')
         
-        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 4 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'${files#*>}_'+str(i+1)+'.csv'+'\n'+'done')
+        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 8 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'${files#*>}_'+str(i+1)+'.csv'+'\n'+'done')
         
         script.close()
   

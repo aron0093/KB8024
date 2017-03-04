@@ -4,8 +4,8 @@ Created on Tue Feb 21 21:00:20 2017
 
 @author: Revant
 """
-import dense_data_parser
-import pssm_gen
+import dense_data_parser as dpp
+import pssm_func as pf
 from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
 import time
@@ -13,7 +13,7 @@ import paramiko
 import os
 
 # data_parsing + general
-filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_30_slice.txt'''
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 #outpath = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/Window_1/'''
 window_size = 1
 single_file = True
@@ -34,7 +34,15 @@ outpath = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
 
 start = time.time()
 
+data = dpp.pre_vec_parser(filepath, window_size)
 
+s = set()
+
+for seq in data['Sequence']:
+    for char in seq:
+        s.add(char)
+        
+print(s)
 #pssm_gen.data_divide(filepath, pssm_split_loc, divisions)
 
 #p = subprocess.Popen(str(psi_cline),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)

@@ -47,15 +47,13 @@ def cv_data_gen(data, K, randomise=False):
     if randomise:
         data = shuffle(data)
         
-    else:
-        print("Data is not shuffled")
         
     splits = np.array_split(data, K)
                          
     for k in range(K):
         train_sets = [item for i,item in enumerate(splits) if i!=k ]
-        train_data = pd.concat(train_sets)
-        test_data = splits[k]     
+        train_data = pd.concat(train_sets, ignore_index=True)
+        test_data = pd.DataFrame(splits[k]).reset_index(drop =True)    
         
         yield train_data, test_data
 
@@ -145,15 +143,12 @@ def skl_inp_gen(filepath, outpath, window_size, single_file=True):
 
 # Generates input arrays for sklearn
 
-def skl_parser(data):
+def skl_parser(data,window_size):
 
     import numpy as np
     import pandas as pd
     import re
-    
-    
-    
-    
+   
 
     # Create formatted input file
 
@@ -216,13 +211,12 @@ def skl_parser(data):
 
 # Generates input arrays for sklearn using pssm.
     
-def skl_pssm_parser(data,pssm_list):
+def skl_pssm_parser(data, window_size, pssm_list):
 
     import numpy as np
     import pandas as pd
     import re
-
-
+    
 
     # Create formatted input file
 
