@@ -32,17 +32,28 @@ num_thr = 8
 outpath = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
 #divisions = 28
 
+# Pssm location
+pssm_loc = '/home/u2196/Desktop/KB8024/KB8024/SignalP/input/pssms/'
+
 start = time.time()
 
 data = dpp.pre_vec_parser(filepath, window_size)
 
-s = set()
+for fil in os.listdir(pssm_loc):
+    for prot in data['Title']:
+        if prot == fil.partition('.')[0]:
+            with open(pssm_loc+fil, 'r') as f:
+                    
+                
+            data['PSSM'] = 
+            
+#s = set()
 
-for seq in data['Sequence']:
-    for char in seq:
-        s.add(char)
+#for seq in data['Sequence']:
+#    for char in seq:
+#        s.add(char)
         
-print(s)
+#print(s)
 #pssm_gen.data_divide(filepath, pssm_split_loc, divisions)
 
 #p = subprocess.Popen(str(psi_cline),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)

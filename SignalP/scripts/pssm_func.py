@@ -90,14 +90,16 @@ def pssm_gen_ssh(database, server_list, file_loc, outpath, username, password_lo
     password = (open(password_loc, 'r').read()).replace('\n','')
         
     for i in range(len(file_loc)):
-    
+      
         server = server_list[i]
         
         script = open(file_loc[i]+'script.sh','w')
         
-        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 8 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'${files#*>}_'+str(i+1)+'.csv'+'\n'+'done')
+        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 3 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'${files#*>}_'+str(i+1)+'.csv'+'\n'+'done')
         
         script.close()
+        
+        
   
         #query_text_a= 'chmod 755'+file_loc[i]+'script.sh'
         query_text= 'bash '+file_loc[i][12:]+'script.sh'
@@ -122,7 +124,8 @@ def pssm_gen_ssh(database, server_list, file_loc, outpath, username, password_lo
           
         #ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(query_text_a)
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(query_text)
-        ssh_stdin.close()
+        #ssh_stdin.close()
+        ssh.close()
         
         time.sleep(1)
         #session = ssh.invoke_shell()

@@ -23,6 +23,7 @@ from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support as score
+from sklearn.utils import resample
 
 #Custom modules
 
@@ -34,10 +35,11 @@ window_size = [2,5,8,10,13]
 
 kernel = str(input("Input kernel type as linear, rbf, poly or sigmoid: "))
 
-filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_30_slice.txt'''
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 output = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/output/window_kernel/'''
-cv_sets = 5
-structure_dic = {'S':-1, 'M':1, 'G':0}
+cv_sets = 3
+n_samples = 500 # Slicing data
+structure_dic = {-1:'S', 1:'M', 0:'G'}
 
 # Starting script
 
@@ -48,8 +50,10 @@ final_list = []
 for windows in window_size:
  
     data = ddp.pre_vec_parser(filepath, windows)
+    
+    data = resample(data, n_samples=n_samples, random_state = 0, replace=False)
 
-    clf = OneVsRestClassifier(SVC( kernel = kernel, class_weight = 'balanced'), n_jobs=-1)
+    clf = OneVsRestClassifier(SVC( kernel = kernel, class_weight = 'balanced', cache_size = 2000), n_jobs=-3)
 
     scores = oD()
     scores['labels'] = np.array([-1,0,1])
