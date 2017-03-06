@@ -9,6 +9,8 @@ Created on Tue Feb 21 21:00:20 2017
 import time
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from collections import OrderedDict as oD
 #import warnings
@@ -85,9 +87,9 @@ for windows in window_size:
         ft = ft + np.array([fit_time])
         
     scores['window']= windows
-    scores['precision'] = normalize(p/cv_sets).reshape(3,)
-    scores['recall'] = normalize(r/cv_sets).reshape(3,)
-    scores['fscore'] = normalize(f/cv_sets).reshape(3,)
+    scores['precision'] = p/cv_sets
+    scores['recall'] = r/cv_sets
+    scores['fscore'] = f/cv_sets
     scores['support'] = normalize(s/cv_sets).reshape(3,)
     scores['fit_time'] = normalize(ft/cv_sets).reshape(3,)        
           
@@ -104,7 +106,7 @@ for clas in set(final_table['labels']):
     temp = final_table.loc[final_table['labels']==clas]
     temp.plot(x='window', y = ['precision', 'recall', 'fscore', 'support', 'fit_time'], kind='bar', colormap='Pastel1')
     plt.xlabel("+/- frames around target residue")
-    plt.ylabel("Normalised Scores")
+    plt.ylabel("Scores")
     plt.title(str(cv_sets)+' CV score for windows for class '+structure_dic[clas]+' using kernel '+kernel)
     plt.savefig(output+str(kernel)+structure_dic[clas]+'.png')         
 
