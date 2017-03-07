@@ -4,7 +4,11 @@ Created on Tue Feb 21 21:00:20 2017
 
 @author: Revant
 """
+
+import pandas as pd
+import numpy as np
 import dense_data_parser as dpp
+import pssm_data_parser as pdp
 import pssm_func as pf
 from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
@@ -33,42 +37,24 @@ outpath = '/home/u2196/Desktop/KB8024/KB8024/data/pssm_split/'
 #divisions = 28
 
 # Pssm location
-pssm_loc = '/home/u2196/Desktop/KB8024/KB8024/SignalP/input/pssms/'
+pssm_loc = '/home/u2196/Desktop/KB8024/KB8024/SignalP/input/test/'
 
 start = time.time()
 
+
 data = dpp.pre_vec_parser(filepath, window_size)
 
-for fil in os.listdir(pssm_loc):
-    for prot in data['Title']:
-        if prot == fil.partition('.')[0]:
-            with open(pssm_loc+fil, 'r') as f:
-                    
-                
-            data['PSSM'] = 
-            
+pssm_data = pdp.pssm_parser(data, window_size, pssm_loc)
 #s = set()
 
 #for seq in data['Sequence']:
 #    for char in seq:
 #        s.add(char)
-        
-#print(s)
-#pssm_gen.data_divide(filepath, pssm_split_loc, divisions)
-
-#p = subprocess.Popen(str(psi_cline),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
-#def bb(db_address, inp_address, out_address, num_iter, num_thr):
-#    psi_cline = NcbipsiblastCommandline('psiblast', db = db_address, query = inp_address+'fasta_form.fasta', num_threads = num_thr, num_iterations = num_iter , outfmt = 5, out_ascii_pssm = out_address+'pssm_out.xml')
-#    psi_cline()
-#    return
-    
-#bb(db_address, inp_address, out_address, num_iter, num_thr)
-#data = dense_data_parser.pre_vec_parser(filepath, window_size)
-
+           
 #for a, b in dense_data_parser.cv_data_gen(data, 5, randomise=False):
 #    print(len(a), len(b))
 
-#X, Y = dense_data_parser.skl_parser(data)
+X, Y = pdp.skl_pssm_parser(pssm_data, window_size, pssm_type='sub')
 
 #####for a,b,c,d in cv_set_gen.cv_set_gen(X, Y, K, randomise=False):
 #####    print(len(a), len(b), len(c), len(d))

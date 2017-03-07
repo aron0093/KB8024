@@ -10,6 +10,8 @@
 -predictions and test outputs
 
     -Window_kernel: Contains data and graphs for comparison.
+    -model: Contains trained models
+    -Linear_grid_search: Contains output results for grid search optimisation of C parameter for LinearSVC
 
 /scripts
 

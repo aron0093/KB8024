@@ -17,5 +17,11 @@ Part of the Master's course in Molecular Techniques in Life Science at Stockholm
 *	Analyse performance compared to other ML methods.
 
 ##FUNCTIONALITY:
+*   Parse raw data from standard format into pandas dataframe supporting custom window_sizes.
+*   Generate PSSM using psiblast locally on multiple CPUs over ssh.
+*   Generate support vectors using PSSM or default encoding.
+*   Compare different kernels, window_sizes and parametes to suit your data. Customised for large, unbalanced datasets for multiclass classification.
+*   Final model is made by bagging 10 LinearSVC estimators though the script is easily modifiable to use any classifier.
+*   Model is stored and can be accessed via bin. Scores and comparisons with other classifiers are available.
 
 ##OPERATIONALITY:

@@ -39,37 +39,12 @@ def pre_vec_parser(filepath, window_size):
 
 # Function to parse pssms
 
-def pssm_parser(data, window_size, pssm_loc):
+def pssm_parser(data, pssm_loc):
     
     import pandas as pd
-    import numpy as np
-    import math
-    import os
+    
+    
 
-    def sigmoid(x):
-        return (1 / (1 + math.exp(-x)))
-
-    data['PSSM_sub']=''
-    data['PSSM_freq']=''
-
-    for fil in os.listdir(pssm_loc):
-        for index, prot in data['Title'].iteritems():
-            if prot[1:] == fil.partition('.')[0]:
-                
-                with open(pssm_loc+fil, 'r') as f:
-                     raw_file = pd.read_csv(f)
-                     raw_pssm = raw_file[raw_file.columns[0]]
-                     
-                     sub = np.zeros(((len(raw_pssm)-6+(2*window_size)),20), dtype=float)
-                     freq = np.zeros(((len(raw_pssm)-6+(2*window_size)),20), dtype=float)
-                     
-                     for i in range(1,(len(raw_pssm)-5)):
-                        sub[i-1+(2*window_size)] = np.array([sigmoid(float(x)) for x in raw_pssm[i].split()[2:22]], dtype=float)
-                        freq[i-1+(2*window_size)] = (np.array((raw_pssm[i].split()[22:42]), dtype=float))/(100.0)
-                        
-                     data['PSSM_sub'][index]= sub 
-                     data['PSSM_freq'][index] = freq  
-    return data
 
 
 def cv_data_gen(data, K, randomise=False):
@@ -95,20 +70,12 @@ def cv_data_gen(data, K, randomise=False):
 
 # Generates input arrays for sklearn using pssm.
     
-def skl_pssm_parser(data, window_size, pssm_type='freq'):      
-        
+def skl_pssm_parser(data, window_size, pssm_list):
+
     import numpy as np
     import pandas as pd
     import re
     
-    # PSSM type
-    
-    if pssm_type == 'sub':
-        pssm = 'PSSM_sub'
-    elif pssm_type == 'freq':
-        pssm = 'PSMM_freq'
-    else:
-        raise ValueError("Invalid pssm type. Expected one of: %s" % (['sub', 'freq']))
 
     # Create formatted input file
 
@@ -129,7 +96,7 @@ def skl_pssm_parser(data, window_size, pssm_type='freq'):
 
             temp_vector = list()
             
-            for a in [data[pssm][i][k] for k in range(j-window_size, j+window_size+1)]: 
+            for a in [aa_dic[data['Sequence_windowed'][i][k]] for k in range(j-window_size, j+window_size+1)]: 
                 temp_vector.extend(a)
 
             X_[j-window_size] = np.array(temp_vector) 
@@ -147,5 +114,68 @@ def skl_pssm_parser(data, window_size, pssm_type='freq'):
             Y = np.concatenate((Y,Y_), axis=0)
      
     return X, Y
+
+# Generates input arrays for sklearn using pssm.
+
+def skl_pssm_inp_gen(filepath, outpath, window_size,pssm_list, single_file=True):
+
+    import numpy as np
+    import re
+
+    # Import data as a pandas dataframe and pivot it to wide form
+    
+    data = pre_vec_parser(filepath, window_size)
+
+    # Create formatted input file
+
+    structure_dic = {'S':-1, 'M':1, 'G':0}
+
+    frame = (2*window_size)+1
+    # Creating separate files for each peptide to avoid working with entire data     
+
+    for i in range(0,len(data['Sequence'])):
+
+        ########## Create vector dictionary from PSSM
+
+        # Using numpy arrays instead of lists to save memory.
+        X = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
+        Y = np.zeros(len(data['Structure'][i])) 
+            
+        for j in range(window_size, (len(data['Sequence_windowed'][i])-window_size)):
+
+            temp_vector = list()
+         
+            for a in [aa_dic[data['Sequence_windowed'][i][k]] for k in range(j-window_size, j+window_size+1)]: 
+                temp_vector.extend(a)
+
+            X[j-window_size] = np.array(temp_vector) 
+            
+        for m in range(0, len(data['Structure'][i])):
+            Y[m]= float(structure_dic[data['Structure'][i][m]])
+
+        assert len(X) == len(Y)
+
+        if single_file==False:
+            
+            out1 = open(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', 'w')
+            out2 = open(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', 'w')
+            out1.close
+            out2.close
+            np.savetxt(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Vectors'+'.gz', X)
+            np.savetxt(outpath+re.sub("[^a-zA-Z0-9]+", '.', data['Title'][i][1:])+'_'+str(window_size)+'_Labels'+'.gz', Y)
+
+        elif single_file==True:
+            if i==0:
+                np.savetxt(open(outpath+str(window_size)+'_Vectors'+'.gz', 'w'), X)
+                np.savetxt(open(outpath+str(window_size)+'_Labels'+'.gz', 'w'), Y)
+                
+            else:            
+                np.savetxt(open(outpath+str(window_size)+'_Vectors'+'.gz', 'a'), X)
+                np.savetxt(open(outpath+str(window_size)+'_Labels'+'.gz', 'a'), Y)
+            
+        else:
+            print("Specify output type as Single or Sequence-wise file(s)")
+    return
+
 
 
