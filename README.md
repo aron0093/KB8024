@@ -25,3 +25,16 @@ Part of the Master's course in Molecular Techniques in Life Science at Stockholm
 *   Model is stored and can be accessed via bin. Scores and comparisons with other classifiers are available.
 
 ##OPERATIONALITY:
+*   Run SignalP_predict.py file to choose between models created in the SignalP project.
+
+## DEVELOPMENTAL STEPS:
+*   Data parsing for defaulte encoding
+*   Generate PSSMS.
+*   Data parsering for MSA encoding.
+*   Comparing performance of various kernels and window sizes using default encoding.
+*   Optimising C via grid search using LinearSVC and optimum window size
+*   Comparing default encoding with MSA encoding.
+*   Further optimising window size.
+*   Using BaggingClassifier to boost performance
+*   Comparing with RandomForestClassifier
+*   Testing on 50 randomn proteins.
