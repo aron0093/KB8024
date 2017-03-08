@@ -16,15 +16,10 @@ from collections import OrderedDict as oD
     
 # Sklearn modules
 
-from sklearn.preprocessing import normalize
-from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
-from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import precision_recall_fscore_support as score
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import f1_score
+from sklearn.metrics import make_scorer
 
 #Custom modules
 
@@ -32,7 +27,7 @@ import dense_data_parser as ddp
 
 # Set parameters
 
-window_size = [2,5,8,10,13]
+window_size = [10,13,15,17,19,21,23,25]
 
 filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 output = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/output/Linear_grid_search/'''
@@ -41,33 +36,50 @@ output = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/output/Linear_grid_search/
 
 start = time.time()
 
+f1_scorer = make_scorer(f1_score, labels=[-1,1], average='macro')
+
 final_list = oD()
 
 for windows in window_size:
  
     data = ddp.pre_vec_parser(filepath, windows)
 
-    clf = LinearSVC(class_weight = 'balanced', cache_size = 2000)
+    clf = LinearSVC(class_weight = 'balanced')
 
     X, Y = ddp.skl_parser(data, windows)
 
     parameters = {"C": [1,2,4,8] }
 
-    model_tunning = GridSearchCV(clf, param_grid=parameters, score_func=f1_score)
+    model_tunning = GridSearchCV(clf, param_grid=parameters, scoring=f1_scorer, n_jobs=-3)
 
     model_tunning.fit(X,Y)
 
     s = model_tunning.best_score_
     p = model_tunning.best_params_
     
-    final_list[str(windows)] = [s,p]       
+    final_list[str(windows)] = [s,p['C']]       
 
 end = time.time()
 
-best_table = pd.DataFrame.from_dict(final_list, orient='columns')
-best_table.to_csv(output+'Linear_grid_search.txt')
+best_table = pd.DataFrame.from_dict(final_list, orient='index')
+best_table.columns= ['F1Score', 'C']
+best_table.to_csv(output+'Linear_grid_search_ss.csv')
 
-print("Script took %f time"%(end-start))
+fig = plt.figure() # Create matplotlib figure
+
+ax = fig.add_subplot(111) # Create matplotlib axes
+ax2 = ax.twinx() # Create another axes that shares the same x-axis as ax.
+
+best_table.plot(x=best_table.index, kind='bar', secondary_y=best_table.columns[1], mark_right=False)
+
+ax.set_ylabel("F1 Score for Signal and Transmembrane Domains")
+ax2.set_ylabel(" C parameter")
+
+plt.xlabel("+/- frames around target residue")
+
+plt.savefig(output+'graph_SS.png')
+
+print("Script took %f seconds"%(end-start))
 '''
 print("Scoring over cross validation sets...")
 

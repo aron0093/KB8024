@@ -32,9 +32,8 @@ Part of the Master's course in Molecular Techniques in Life Science at Stockholm
 *   Generate PSSMS.
 *   Data parsering for MSA encoding.
 *   Comparing performance of various kernels and window sizes using default encoding.
-*   Optimising C via grid search using LinearSVC and optimum window size
+*   Optimising C via grid search using LinearSVC and further optimize window size
 *   Comparing default encoding with MSA encoding.
-*   Further optimising window size.
 *   Using BaggingClassifier to boost performance
 *   Comparing with RandomForestClassifier
 *   Testing on 50 randomn proteins.

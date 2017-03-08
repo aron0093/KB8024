@@ -106,7 +106,7 @@ def skl_pssm_parser(data, window_size, pssm_type='freq'):
     if pssm_type == 'sub':
         pssm = 'PSSM_sub'
     elif pssm_type == 'freq':
-        pssm = 'PSMM_freq'
+        pssm = 'PSSM_freq'
     else:
         raise ValueError("Invalid pssm type. Expected one of: %s" % (['sub', 'freq']))
 
@@ -122,7 +122,8 @@ def skl_pssm_parser(data, window_size, pssm_type='freq'):
         ######## Create vector dictionary from PSSM
 
         # Using numpy arrays instead of lists to save memory.
-        X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),21*frame])
+        X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),20
+        *frame])
         Y_ = np.zeros(len(data['Structure'][i])) 
             
         for j in range(window_size, (len(data['Sequence_windowed'][i])-window_size)):
