@@ -13,14 +13,14 @@ CAUTION: Do not re run script once the model is built.
 
 repo_loc = '''/home/u2196/Desktop/KB8024/KB8024/''' # Enter local repo location. See current version at https://github.com/aron0093/KB8024 for updates.
 window_size = 10 # Create a frame with +/- window_size residues around the target residue. Frame size will be (1+2*window_size).
-use_pssm = False # If True then check wether PSSMs are avilable in SignalP/input/pssms else generate using pssm_script.py
+use_pssm = True # If True then check wether PSSMs are avilable in SignalP/input/pssms else generate using pssm_script.py
 n_estimators = 10 # Number of bagging models
 
 ###### Review following parameters ######
 
 filepath = repo_loc+'''data/globular_signal_tm_3state.txt''' # Location of raw_data
 outpath = repo_loc+'SignalP/output/model/' # Location of output model
-pssm_loc = repo_loc+'SignalP/output/pssms/'
+pssm_loc = repo_loc+'SignalP/input/pssms/'
 
 ###### Importing the required libraries and modules ######
 
@@ -58,8 +58,8 @@ if use_pssm == False:
 
     X, Y =  ddp.skl_parser(data, window_size)
 else:
-    data_pssm = pdp.pssm_parser(data, pssm_loc)
-    X, Y = pdp.skl_pssm_parser(data_pssm, window_size)
+    data_pssm = pdp.pssm_parser(data, window_size, pssm_loc)
+    X, Y = pdp.skl_pssm_parser(data_pssm, window_size, pssm_type='freq')
   
 # Train model
 

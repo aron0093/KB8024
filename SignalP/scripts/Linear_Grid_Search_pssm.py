@@ -29,9 +29,9 @@ import pssm_data_parser as pdp
 
 window_size = [10,13,15,17,19,21,23,25]
 
-filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state_30_slice.txt'''
+filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 output = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/output/Linear_grid_search/'''
-pssm_type = 'freq'
+pssm_type = 'sub'
 pssm_loc = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/pssms/'''
 # Starting script
 
@@ -68,7 +68,7 @@ end = time.time()
 
 best_table = pd.DataFrame.from_dict(final_list, orient='index')
 best_table.columns= ['F1Score', 'C']
-best_table.to_csv(output+'Linear_grid_search_'+pssm_type+'.csv')
+best_table.to_csv(output+'Linear_grid_search_'+pssm_type+'_3.csv')
 
 fig = plt.figure() # Create matplotlib figure
 
@@ -81,7 +81,7 @@ ax.set_ylabel("F1 Score for Signal and Transmembrane Domains")
 ax2.set_ylabel(" C parameter")
 
 plt.xlabel("+/- frames around target residue")
-plt.savefig(output+'graph_'+pssm_type+'.png')
+plt.savefig(output+'graph_'+pssm_type+'_3.png')
 
 print("Script took %f seconds"%(end-start))
 '''

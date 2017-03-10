@@ -11,10 +11,10 @@ Run this script to get predictions the model. To train a new model see the 'mode
 
 repo_loc = '''/home/u2196/Desktop/KB8024/KB8024/''' # Enter local repo location. See current version at https://github.com/aron0093/KB8024 for updates.
 test_data_gen = bool(input("You actually want to use this to predict stuff??? Enter True for madness, enter False to check my work!: ")) # Enter if test data is to be parsed.
-use_pssm = False
+use_pssm = True
 ###### Review following parameters ######
 
-filepath = repo_loc+'''data/globular_signal_tm_3state_100_slice.txt''' # Location of test raw_data
+filepath = repo_loc+'''data/TOPDB_50.txt''' # Location of test raw_data
 inpath = repo_loc+'SignalP/output/model/' # Location of models
 database = '/local_uniref/uniref/uniref50/uniref50.db' 
 ###### Importing the required libraries and modules ######
@@ -27,16 +27,52 @@ import pandas as pd
 import numpy as np
 from collections import OrderedDict as oD
 from matplotlib import pyplot as plt
+import itertools
 
 #Sklearn Modules
 
 from sklearn.externals import joblib
 from sklearn.metrics import precision_recall_fscore_support as score
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import normalize
 #Custom Modules
 
 import pssm_data_parser as pdp
-import dense_data_parser as ddp
+import dense_data_parser_basicGrade as ddp
+
+# Custom functions
+
+def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
+
+    from matplotlib import pyplot as plt
+    
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, round(cm[i, j]*100, 2),
+                 horizontalalignment="center",
+                 color="green" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    
+    return
 
 ###### Model selection ######
 print("\n")
@@ -67,8 +103,11 @@ if test_data_gen == True:
     
         X_test, Y_test =  ddp.skl_parser(data, window_size)
     else:
-        data_pssm = pdp.pssm_parser(data, pssm_loc)
-        X_test, Y_test = pdp.skl_pssm_parser(data_pssm, window_size)
+        
+        pssm_loc = repo_loc+'SignalP/input/test_pssms/'
+        data_pssm = pdp.pssm_parser(data, window_size, pssm_loc)
+        
+        X_test, Y_test = pdp.skl_pssm_parser(data, window_size, pssm_type='freq')
         
     # Test model
   
@@ -83,24 +122,33 @@ if test_data_gen == True:
     Y_pred = model.predict(X_test)
 
     precision, recall, fscore, support = score(Y_test, Y_pred)
-
+    
+    cm = confusion_matrix(Y_test, Y_pred)
+    
+    classes = ['Signal', 'Globular', 'TransMembrane']
+    
     scores['precision'] = precision
     scores['recall'] = recall
     scores['fscore'] = fscore
     scores['norm_support'] = normalize(support).reshape(3,)
 
     scores_table = pd.DataFrame.from_dict(scores, orient='columns')
+    
     scores_table.plot(x='labels', y = ['precision', 'recall', 'fscore', 'norm_support'], kind='bar', colormap='Pastel1')
-
-    plt.xlabel("Classes -1:Signal 0:Globular, 1:Transmembrane")
+    plt.figure(1)
+    plt.xlabel("Classes -1:Signal 0:Globular, 1:TransMembrane")
     plt.ylabel("Scores")
     plt.title("Are you not entertained...")
 
     print("Test results...")
     print("\n")
-    print(scores_table)
+    print(classification_report(Y_test, Y_pred, target_names=['Signal', 'Globular', 'Transmembrane']))
     print("\n")
-    plt.show()
+    plt.figure(1).show()
+    
+    plt.figure(2)
+    plot_confusion_matrix(cm, classes, normalize=True)
+    plt.figure(2).show()
 
 else:
 
@@ -108,21 +156,36 @@ else:
     
     X_test_loc = input("Enter location of target sequence in fasta format")
     
-    target_seq = pd.read_csv(X_test_loc)
+    with open(X_test_loc, 'r') as f:
+        out = open(repo_loc+'SignalP/output/temp/temp.txt', 'w')
+        for lines in f:
+            out.write(lines)
+            a = len(lines)
+        out.write('G'*a)
+        out.close()
+     
+     
+    data = pdp.pre_vec_parser(repo_loc+'SignalP/output/temp/temp.txt', window_size)
     
-    from Bio.Blast.Applications import NcbipsiblastCommandline
+    have_pssm = bool(input("Do you have psiblast pssm in csv format?"))
     
-    out_pssm = repo_loc+'/SignalP/output/temp.csv'
-    psi_cline = NcbipsiblastCommandline('psiblast', db = database, query = inp_fasta, num_threads = num_thr, num_iterations = num_iter , outfmt = 10, out_ascii_pssm = out_pssm)
-    psi_cline()
+    if have_pssm==True:
+        X_pssm_loc = input("Enter location of psiblast pssm in csv format")
+        
+        X_test, Y_test = pdp.skl_pssm_parser(data, window_size, 'freq')
+    else:
     
-    #Code to read PSSM and encode protein
-    
-    #X_test =
-    
+        X_test, Y_test = ddp.skl_parser(data, window_size)
+            
     Y_pred = model.predict(X_test)
     
-    print(Y_pred)
+    structure_dic = {-1:'S', 1:'M', 0:'G'}
+    
+    prediction_list = [structure_dic[item] for item in Y_pred]
+    
+    predcition = str(prediction_list)
+    
+    print(prediction)
       
 
 
