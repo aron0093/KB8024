@@ -31,7 +31,7 @@ window_size = [10,13,15,17,19,21,23,25]
 
 filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 output = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/output/Linear_grid_search/'''
-pssm_type = 'sub'
+pssm_type = 'freq'
 pssm_loc = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/input/pssms/'''
 # Starting script
 
@@ -55,7 +55,7 @@ for windows in window_size:
 
     parameters = {"C": [1,2,4,8] }
 
-    model_tunning = GridSearchCV(clf, param_grid=parameters, scoring=f1_scorer, n_jobs=-3)
+    model_tunning = GridSearchCV(clf, param_grid=parameters, scoring=f1_scorer)
 
     model_tunning.fit(X,Y)
 
@@ -82,7 +82,7 @@ ax2.set_ylabel(" C parameter")
 
 plt.xlabel("+/- frames around target residue")
 plt.savefig(output+'graph_'+pssm_type+'_3.png')
-
+plt.close()
 print("Script took %f seconds"%(end-start))
 '''
 print("Scoring over cross validation sets...")

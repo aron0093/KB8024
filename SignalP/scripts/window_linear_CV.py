@@ -19,11 +19,8 @@ from collections import OrderedDict as oD
 # Sklearn modules
 
 from sklearn.preprocessing import normalize
-from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support as score
 from sklearn.utils import resample
 
@@ -33,12 +30,12 @@ import dense_data_parser as ddp
 
 # Set parameters
 
-window_size = [2,5,8,10,13]
+window_size = [15,17,19,21,23,25]
 
 filepath = '''/home/u2196/Desktop/KB8024/KB8024/data/globular_signal_tm_3state.txt'''
 output = '''/home/u2196/Desktop/KB8024/KB8024/SignalP/output/window_kernel/'''
 cv_sets = 3
-n_samples = 500 # Slicing data
+
 structure_dic = {-1:'S', 1:'M', 0:'G'}
 
 # Starting script
@@ -51,8 +48,7 @@ for windows in window_size:
  
     data = ddp.pre_vec_parser(filepath, windows)
     
-    data = resample(data, n_samples=n_samples, random_state = 0, replace=False)
-
+    
     clf = LinearSVC(class_weight = 'balanced')
 
     scores = oD()
@@ -98,7 +94,7 @@ for windows in window_size:
     final_list.append(scores_table)
 
 final_table = pd.concat(final_list, ignore_index = True)
-final_table.to_csv(output+'LinearSVC'+'.csv')
+final_table.to_csv(output+'LinearSVC_newwind'+'.csv')
 
 for clas in set(final_table['labels']):
     temp = final_table.loc[final_table['labels']==clas]
@@ -106,7 +102,7 @@ for clas in set(final_table['labels']):
     plt.xlabel("+/- frames around target residue")
     plt.ylabel("Scores")
     plt.title(str(cv_sets)+' CV score for windows for class '+structure_dic[clas]+' using LinearSVC')
-    plt.savefig(output+'LinearSVC'+structure_dic[clas]+'.png')         
+    plt.savefig(output+'LinearSVC_newwind'+structure_dic[clas]+'.png')         
 
 end = time.time()
 

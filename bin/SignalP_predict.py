@@ -16,6 +16,7 @@ use_pssm = True
 
 filepath = repo_loc+'''data/TOPDB_50.txt''' # Location of test raw_data
 inpath = repo_loc+'SignalP/output/model/' # Location of models
+outpath = repo_loc+'SignalP/output/test_stats/' # Location of results
 database = '/local_uniref/uniref/uniref50/uniref50.db' 
 ###### Importing the required libraries and modules ######
 
@@ -133,7 +134,7 @@ if test_data_gen == True:
     scores['norm_support'] = normalize(support).reshape(3,)
 
     scores_table = pd.DataFrame.from_dict(scores, orient='columns')
-    
+    scores_table.to_csv(outpath+model_name+'.csv')
     scores_table.plot(x='labels', y = ['precision', 'recall', 'fscore', 'norm_support'], kind='bar', colormap='Pastel1')
     plt.figure(1)
     plt.xlabel("Classes -1:Signal 0:Globular, 1:TransMembrane")
@@ -144,12 +145,12 @@ if test_data_gen == True:
     print("\n")
     print(classification_report(Y_test, Y_pred, target_names=['Signal', 'Globular', 'Transmembrane']))
     print("\n")
+    plt.figure(1).savefig(outpath+model_name+'data_plot.png')
     plt.figure(1).show()
-    
     plt.figure(2)
     plot_confusion_matrix(cm, classes, normalize=True)
+    plt.figure(2).savefig(outpath+model_name+'confusion.png')
     plt.figure(2).show()
-
 else:
 
     print("\n")

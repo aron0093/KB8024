@@ -18,12 +18,9 @@ from collections import OrderedDict as oD
     
 # Sklearn modules
 
-from sklearn.preprocessing import normalize
-from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+from sklearn.preprocessing import normalize 
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support as score
 from sklearn.utils import resample
 
@@ -55,7 +52,7 @@ for windows in window_size:
     
     data = resample(data, n_samples=n_samples, random_state = 0, replace=False)
 
-    clf = OneVsRestClassifier(SVC( kernel = kernel, class_weight = 'balanced', cache_size = 2000), n_jobs=-3)
+    clf = OneVsRestClassifier(SVC( kernel = kernel, class_weight = 'balanced', cache_size = 20000), n_jobs=-3)
 
     scores = oD()
     scores['labels'] = np.array([-1,0,1])

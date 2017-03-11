@@ -46,11 +46,14 @@ def pssm_parser(data, window_size, pssm_loc):
     import math
     import os
 
+    # Sigmoid function to normalise substitution matrix
     def sigmoid(x):
         return (1 / (1 + math.exp(-x)))
 
     data['PSSM_sub']=''
     data['PSSM_freq']=''
+    
+    # Selecting PSSMs
 
     for fil in os.listdir(pssm_loc):
         for index, prot in data['Title'].iteritems():
@@ -60,8 +63,12 @@ def pssm_parser(data, window_size, pssm_loc):
                      raw_file = pd.read_csv(f)
                      raw_pssm = raw_file[raw_file.columns[0]]
                      
+                     # Expected vector shape for numpy arrays
+                     
                      sub = np.zeros(((len(raw_pssm)-6+(2*window_size)),20), dtype=float)
                      freq = np.zeros(((len(raw_pssm)-6+(2*window_size)),20), dtype=float)
+                     
+                     # Storing substituion and frequency matrices in separate cells for each sequence
                      
                      for i in range(1,(len(raw_pssm)-5)):
                         sub[i-1+(2*window_size)] = np.array([sigmoid(float(x)) for x in raw_pssm[i].split()[2:22]], dtype=float)
@@ -73,6 +80,8 @@ def pssm_parser(data, window_size, pssm_loc):
 
 
 def cv_data_gen(data, K, randomise=False):
+
+    # Protein level division of data for cross validation
 
     import pandas as pd
     import numpy as np

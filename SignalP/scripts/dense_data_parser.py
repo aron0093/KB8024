@@ -40,6 +40,8 @@ def pre_vec_parser(filepath, window_size):
 
 def cv_data_gen(data, K, randomise=False):
 
+    # Protein level division of data for cross validation
+
     import pandas as pd
     import numpy as np
     from sklearn.utils import shuffle
