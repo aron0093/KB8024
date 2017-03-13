@@ -3,6 +3,7 @@
 -parsed data stored for later use
 
     -pssms: Contains all pssm from psiblast.
+    -test_pssms: Contains pssms for the test dataset TOPDB_50
     -Window_3: Contains all proteins vectorised with a 3 residue frame. 
 
 /ouput
@@ -10,8 +11,10 @@
 -predictions and test outputs
 
     -Window_kernel: Contains data and graphs for comparison.
-    -model: Contains trained models
+    -model: Contains trained models and training statistics.
     -Linear_grid_search: Contains output results for grid search optimisation of C parameter for LinearSVC
+    -temp: Temporary files generated via prediction generation. Should be empty.
+    -test_stats: Test statistics generated via model testing in bin.
 
 /scripts
 
