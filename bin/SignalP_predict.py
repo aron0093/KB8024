@@ -257,19 +257,24 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
     structure_dic = {-1:'S', 1:'M', 0:'G'}
     
     prediction_list = [structure_dic[item] for item in Y_pred]
-    prediction = ''.join(prediction_list)
+    
     
     print(" Here are your results!")
     
+    # Printing predictions with corrective rules
+    
+    c= 0   
     for i in range(0,len(prot_collector)):
         print(prot_collector[i])
-        preds = prediction[len_collector[i]:len_collector[i+1]]
+        preds = prediction_list[len_collector[i]:len_collector[i+1]]
         for eles in preds[:10]:
             if eles == 'S':
                 c = c +1
             if c>=5:
-                preds[:10] = 'S'*10
-        print(preds)
+                for i in range(0, len(preds[:10])):
+                    preds[i] = 'S' 
+                    
+        print(''.join(preds))
      
     os.remove(repo_loc+'SignalP/output/temp/temp.txt')
     for fils in os.listdir(repo_loc+'SignalP/output/temp/pssms/'):
