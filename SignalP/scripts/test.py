@@ -45,6 +45,7 @@ start = time.time()
 data = dpp.pre_vec_parser(filepath, window_size)
 
 pssm_data = pdp.pssm_parser(data, window_size, pssm_loc)
+
 #s = set()
 
 #for seq in data['Sequence']:

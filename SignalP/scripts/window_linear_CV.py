@@ -102,7 +102,7 @@ for clas in set(final_table['labels']):
     plt.xlabel("+/- frames around target residue")
     plt.ylabel("Scores")
     plt.title(str(cv_sets)+' CV score for windows for class '+structure_dic[clas]+' using LinearSVC')
-    plt.savefig(output+'LinearSVC_newwind'+structure_dic[clas]+'.png')         
+    plt.figure(figsize=(20,10)).savefig(output+'LinearSVC_newwind'+structure_dic[clas]+'.png')         
 
 end = time.time()
 

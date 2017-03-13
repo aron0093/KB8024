@@ -21,7 +21,7 @@ use_pssm = True # If True then check wether PSSMs are avilable in SignalP/input/
 filepath = repo_loc+'''data/globular_signal_tm_3state_30_slice.txt''' # Location of raw_data
 outpath = repo_loc+'SignalP/output/model/' # Location of output model
 pssm_loc = repo_loc+'SignalP/input/pssms/'
-
+pssm_type = 'sub'
 ###### Importing the required libraries and modules ######
 
 # General Libraries
@@ -100,7 +100,7 @@ if use_pssm == False:
     X, Y =  ddp.skl_parser(data, window_size)
 else:
     data_pssm = pdp.pssm_parser(data, window_size, pssm_loc)
-    X, Y = pdp.skl_pssm_parser(data_pssm, window_size, pssm_type='freq')
+    X, Y = pdp.skl_pssm_parser(data_pssm, window_size, pssm_type=pssm_type)
   
 # Train model
 
@@ -130,18 +130,18 @@ scores['recall'] = recall
 scores['fscore'] = fscore
 scores['norm_support'] = normalize(support).reshape(3,)
 scores_table = pd.DataFrame.from_dict(scores, orient='columns')
-scores_table.to_csv(outpath+'model_stats/'+'SignalP_Decision_Tree_wind_final_bagging'+str(window_size)+'data.csv')    
+scores_table.to_csv(outpath+'model_stats/'+'Decision_Tree_wind'+str(window_size)+'_'+pssm_type+'.csv')    
 scores_table.plot(x='labels', y = ['precision', 'recall', 'fscore', 'norm_support'], kind='bar', colormap='Pastel1')
 plt.figure(1)
 plt.xlabel("Classes -1:Signal 0:Globular, 1:TransMembrane")
 plt.ylabel("Scores")
 plt.title("Are you not entertained...")
 
-plt.figure(1).savefig(outpath+'model_stats/'+'SignalP_Decision_Tree_wind_final_bagging'+str(window_size)+'data_plot.png')
+plt.figure(1, figsize=(20,10)).savefig(outpath+'model_stats/'+'Decision_Tree_wind'+str(window_size)+'_'+pssm_type+'_plot.png')
   
 plt.figure(2)
 plot_confusion_matrix(cm, classes, normalize=True)
-plt.figure(2).savefig(outpath+'model_stats/'+'SignalP_Decision_Tree_wind_final_bagging'+str(window_size)+'confusion_plot.png')
+plt.figure(2, figsize=(20,10)).savefig(outpath+'model_stats/'+'Decision_Tree_wind'+str(window_size)+'_'+pssm_type+'_conf.png')
 
 
 fit_end = time.time()
@@ -149,7 +149,7 @@ fit_end = time.time()
 print("Training completed in %f seconds"%(fit_end - fit_start))
 print("\n")
 
-model_name = 'SignalP_Decision_Tree_wind_final_bagging'+str(window_size)
+model_name = 'Decision_Tree_wind'+str(window_size)+'_'+pssm_type
 
 joblib.dump(model, outpath+model_name)
 

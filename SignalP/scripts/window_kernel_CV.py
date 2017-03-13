@@ -105,7 +105,7 @@ for clas in set(final_table['labels']):
     plt.xlabel("+/- frames around target residue")
     plt.ylabel("Scores")
     plt.title(str(cv_sets)+' CV score for windows for class '+structure_dic[clas]+' using kernel '+kernel)
-    plt.savefig(output+str(kernel)+structure_dic[clas]+'.png')         
+    plt.figure(figsize=(20,10)).savefig(output+str(kernel)+structure_dic[clas]+'.png')         
 
 end = time.time()
 

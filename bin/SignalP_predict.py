@@ -10,14 +10,16 @@ Run this script to get predictions the model. To train a new model see the 'mode
 ###### Enter the following parameters ######
 
 repo_loc = '''/home/u2196/Desktop/KB8024/KB8024/''' # Enter local repo location. See current version at https://github.com/aron0093/KB8024 for updates.
-test_data_gen = bool(input("You actually want to use this to predict stuff??? Enter True for madness, enter False to check my work!: ")) # Enter if test data is to be parsed.
-use_pssm = True
+test_data_gen = input("You actually want to use this to predict stuff??? Enter True for subpar predictions, enter False to check my work on 50 proteins from TOPDB!: ") # Enter if test data is to be parsed.
+use_pssm = True # Use pssm for test data or simple encoding, pssm prefered.
+
 ###### Review following parameters ######
 
 filepath = repo_loc+'''data/TOPDB_50.txt''' # Location of test raw_data
 inpath = repo_loc+'SignalP/output/model/' # Location of models
 outpath = repo_loc+'SignalP/output/test_stats/' # Location of results
-database = '/local_uniref/uniref/uniref50/uniref50.db' 
+database = '/local_uniref/uniref/uniref50/uniref50.db' # Psiblast database
+
 ###### Importing the required libraries and modules ######
 
 # General Libraries
@@ -37,10 +39,11 @@ from sklearn.metrics import precision_recall_fscore_support as score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import normalize
+
 #Custom Modules
 
 import pssm_data_parser as pdp
-import dense_data_parser_basicGrade as ddp
+import dense_data_parser as ddp
 
 # Custom functions
 
@@ -76,6 +79,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     return
 
 ###### Model selection ######
+
 print("\n")
 print(str(os.listdir(inpath)))
 print("\n")
@@ -86,8 +90,10 @@ window_size = int(input("Enter Window Size associated with model: ")) # Fixed an
 
 ###### Data preprocessing and storage. ######
 
+# Testing predictor on TOPDB_50 data
+
 # Import data as pandas dataframe
-if test_data_gen == True:
+if test_data_gen == 'False' or test_data_gen == 'false':
 
     
     print("Parsing data...")
@@ -145,50 +151,119 @@ if test_data_gen == True:
     print("\n")
     print(classification_report(Y_test, Y_pred, target_names=['Signal', 'Globular', 'Transmembrane']))
     print("\n")
-    plt.figure(1).savefig(outpath+model_name+'data_plot.png')
-    plt.figure(1).show()
+    plt.figure(1, figsize=(20,10)).savefig(outpath+model_name+'data_plot.png')
+    plt.figure(1, figsize=(20,10)).show()
     plt.figure(2)
     plot_confusion_matrix(cm, classes, normalize=True)
-    plt.figure(2).savefig(outpath+model_name+'confusion.png')
-    plt.figure(2).show()
-else:
+    plt.figure(2, figsize=(20,10)).savefig(outpath+model_name+'confusion.png')
+    plt.figure(2, figsize=(20,10)).show()
+
+elif test_data_gen == 'True' or test_data_gen == 'true':
+
+# Generate predictions for novel proteins
 
     print("\n")
     
-    X_test_loc = input("Enter location of target sequence in fasta format")
+    import re
+    import subprocess
+    from subprocess import Popen, PIPE
+    
+    # Import sequence to be predicted
+    
+    X_test_loc = input("Enter location of target sequences in fasta format")    
+    with open(X_test_loc, 'r') as f:
+        len_f = len(f.readlines())
+    
+    collect = ''
+    len_collector = []
+    prot_collector = []
+    lol = 0
+    a = 0
+    
+    # Generate temp files to store sequence, generate base annotation and psiblast prep
     
     with open(X_test_loc, 'r') as f:
+        
         out = open(repo_loc+'SignalP/output/temp/temp.txt', 'w')
-        for lines in f:
-            out.write(lines)
-            a = len(lines)
-        out.write('G'*a)
+        
+        for i,lines in enumerate(f):
+            if lines.startswith('>'):
+                
+                if lol == 1:
+                    a = a + len(collect)
+                    len_collector.append(a)
+                    prot_collector.append(lines)
+                    out.write(collect+'\n')
+                    out_.write(collect+'\n')
+                    out_.close()
+                    out.write(('G'*len(collect))+'\n')
+                    collect = ''
+                out.write(lines)
+                out_ = open(repo_loc+'SignalP/output/temp/prots/'+re.sub('[^A-Za-z0-9]+', '', lines[1:10])+'.txt', 'w')           
+                out_.write(lines)
+                lol = 1
+            
+            else:
+                collect = collect + lines.strip()
+                if i == (len_f-1):
+                    a = a + len(collect)
+                    len_collector.append(a)
+                    prot_collector.append(lines)
+                    out.write(collect+'\n')
+                    out_.write(collect+'\n')
+                    out_.close()
+                    out.write(('G'*len(collect))+'\n')
+                    collect = ''             
         out.close()
-     
+    print("File input complete")
      
     data = pdp.pre_vec_parser(repo_loc+'SignalP/output/temp/temp.txt', window_size)
-    
-    have_pssm = bool(input("Do you have psiblast pssm in csv format?"))
-    
-    if have_pssm==True:
-        X_pssm_loc = input("Enter location of psiblast pssm in csv format")
         
-        X_test, Y_test = pdp.skl_pssm_parser(data, window_size, 'freq')
-    else:
+    pssm_loc = repo_loc+'SignalP/output/temp/pssms/'
     
-        X_test, Y_test = ddp.skl_parser(data, window_size)
+    print("Running psiblast")
+    
+    # Run psiblast as using subprocess 
+        
+    script = open(repo_loc+'SignalP/output/temp/prots/'+'script.sh','w')
+        
+    script.write('#!/bin/bash'+'\n'+'for files in '+repo_loc+'SignalP/output/temp/prots/'+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 3 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+pssm_loc+'$files.csv'+'\n'+'done')
+        
+    script.close()
+    
+    query_text = 'bash '+repo_loc+'SignalP/output/temp/prots/'+'script.sh'
+    
+    
+    now = subprocess.Popen(query_text, stdout=PIPE, stderr=PIPE, shell=True)
+    stdout, stderr = now.communicate()
+  
+    print("Vectorising data")
+    
+    pssm_data = pdp.pssm_parser(data, window_size, pssm_loc)
+    
+    X_test, Y_test = pdp.skl_pssm_parser(pssm_data, window_size, 'sub')    
             
+    model = joblib.load(inpath+model_name)
+    
+    print(" Generating predictions")
+    
+    # Output predictions by protein
+    
     Y_pred = model.predict(X_test)
     
     structure_dic = {-1:'S', 1:'M', 0:'G'}
     
     prediction_list = [structure_dic[item] for item in Y_pred]
     
-    predcition = str(prediction_list)
+    print(" Here are your results!")
     
-    print(prediction)
+    for i in range(0,len(prot_collector)):
+        print(prot_collector[i])
+        print(prediction_list[len_collector[i-1]:len_collector[i]])
       
+else:
 
+    print("Sorry, thats not an option! Try again!")
 
 
 

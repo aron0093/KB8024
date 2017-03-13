@@ -77,7 +77,7 @@ ax2.set_ylabel(" C parameter")
 
 plt.xlabel("+/- frames around target residue")
 
-plt.savefig(output+'graph_SS.png')
+plt.figure(figsize=(20,10)).savefig(output+'graph_SS.png')
 
 print("Script took %f seconds"%(end-start))
 '''

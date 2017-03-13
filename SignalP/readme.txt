@@ -23,6 +23,10 @@
 	-pssm_func: Contains functions to generate pssm using psiblast on multiple computers over ssh.
 	-pssm_ssh: Script to run psiblast by dividing data and executing on all computers.
 	-window_kernel_CV: Scoring various SVM kernels and window sizes.
-	-Linear_grid_search: Grid search to optimise C parameter using LinearSVC.
+	-window_linear_CV: Scoring LinearSVC with window sizes.
+	-Linear_grid_search: Grid search to optimise C parameter, window size using LinearSVC.
+	-Linear_grid_search_pssm: Grid search to optimise C parameter, window size using LinearSVC over MSA data.
 	-model_builder: Final script to process data and build the model.
+	-Decision_tree_builder: Build decision tree for comparison
+	-Random_Forest_builder: Build random forest for comparison
 	-test: staging area for testing WIP code.
