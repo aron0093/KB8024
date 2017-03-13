@@ -29,12 +29,15 @@ def pre_vec_parser(filepath, window_size):
     pre_suf = ['B']*window_size
 
     data['Sequence_windowed'] = ''
-
+    
+    
     # Use ''.join for efficiency instead of +. Also use nested loops instead of storing variables.
 
     for i in range(0,len(data['Sequence'])):
         data['Sequence_windowed'][i] = ''.join([''.join(pre_suf), data['Sequence'][i], ''.join(pre_suf)])
 
+    data['Title'].replace(to_replace = '[^A-Za-z0-9]+', value = '', regex=True, inplace=True)
+    
     return data
 
 

@@ -10,9 +10,9 @@ Run this script to get predictions the model. To train a new model see the 'mode
 ###### Enter the following parameters ######
 
 repo_loc = '''/home/u2196/Desktop/KB8024/KB8024/''' # Enter local repo location. See current version at https://github.com/aron0093/KB8024 for updates.
-test_data_gen = input("You actually want to use this to predict stuff??? Enter True for subpar predictions, enter False to check my work on 50 proteins from TOPDB!: ") # Enter if test data is to be parsed.
+test_data_gen = input("You actually want to use this to predict stuff??? Enter True for super-duper, most amazing predictions. Enter False to check my work on 50 proteins from TOPDB!: ") # Enter if test data is to be parsed.
 use_pssm = True # Use pssm for test data or simple encoding, pssm prefered.
-
+pssm_type = 'sub'
 ###### Review following parameters ######
 
 filepath = repo_loc+'''data/TOPDB_50.txt''' # Location of test raw_data
@@ -86,7 +86,8 @@ print("\n")
 
 model_name = str(input("Enter Model Name from the list above: ")) # Enter the desired model file
 print("\n")
-window_size = int(input("Enter Window Size associated with model: ")) # Fixed and unchangeable depending on model
+window_size = int(model_name[model_name.find('wind')+4:model_name.find('wind')+6])
+#window_size = int(input("Enter Window Size associated with model: ")) # Fixed and unchangeable depending on model
 
 ###### Data preprocessing and storage. ######
 
@@ -162,20 +163,21 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
 
 # Generate predictions for novel proteins
 
-    print("\n")
+    
     
     import re
+    import os
+    import time
     import subprocess
-    from subprocess import Popen, PIPE
     
     # Import sequence to be predicted
     
-    X_test_loc = input("Enter location of target sequences in fasta format")    
+    X_test_loc = input("Enter location of target sequences in fasta format: ")    
     with open(X_test_loc, 'r') as f:
         len_f = len(f.readlines())
     
     collect = ''
-    len_collector = []
+    len_collector = [0]
     prot_collector = []
     lol = 0
     a = 0
@@ -192,14 +194,14 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
                 if lol == 1:
                     a = a + len(collect)
                     len_collector.append(a)
-                    prot_collector.append(lines)
                     out.write(collect+'\n')
                     out_.write(collect+'\n')
                     out_.close()
                     out.write(('G'*len(collect))+'\n')
                     collect = ''
                 out.write(lines)
-                out_ = open(repo_loc+'SignalP/output/temp/prots/'+re.sub('[^A-Za-z0-9]+', '', lines[1:10])+'.txt', 'w')           
+                prot_collector.append(lines)
+                out_ = open(repo_loc+'SignalP/output/temp/prots/'+re.sub('[^A-Za-z0-9]+', '',lines)+'.txt', 'w')           
                 out_.write(lines)
                 lol = 1
             
@@ -208,7 +210,6 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
                 if i == (len_f-1):
                     a = a + len(collect)
                     len_collector.append(a)
-                    prot_collector.append(lines)
                     out.write(collect+'\n')
                     out_.write(collect+'\n')
                     out_.close()
@@ -227,21 +228,23 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
         
     script = open(repo_loc+'SignalP/output/temp/prots/'+'script.sh','w')
         
-    script.write('#!/bin/bash'+'\n'+'for files in '+repo_loc+'SignalP/output/temp/prots/'+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 3 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+pssm_loc+'$files.csv'+'\n'+'done')
+    script.write('#!/bin/bash'+'\n'+'for files in '+repo_loc+'SignalP/output/temp/prots/'+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 3 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+pssm_loc+'${files##*/}.csv'+'\n'+'done')
         
     script.close()
     
     query_text = 'bash '+repo_loc+'SignalP/output/temp/prots/'+'script.sh'
     
     
-    now = subprocess.Popen(query_text, stdout=PIPE, stderr=PIPE, shell=True)
-    stdout, stderr = now.communicate()
+    now = subprocess.Popen(query_text, shell=True)
+    now.wait()
   
+    time.sleep(20)
+    
     print("Vectorising data")
     
     pssm_data = pdp.pssm_parser(data, window_size, pssm_loc)
     
-    X_test, Y_test = pdp.skl_pssm_parser(pssm_data, window_size, 'sub')    
+    X_test, Y_test = pdp.skl_pssm_parser(pssm_data, window_size, pssm_type=pssm_type)    
             
     model = joblib.load(inpath+model_name)
     
@@ -254,12 +257,25 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
     structure_dic = {-1:'S', 1:'M', 0:'G'}
     
     prediction_list = [structure_dic[item] for item in Y_pred]
+    prediction = ''.join(prediction_list)
     
     print(" Here are your results!")
     
     for i in range(0,len(prot_collector)):
         print(prot_collector[i])
-        print(prediction_list[len_collector[i-1]:len_collector[i]])
+        preds = prediction[len_collector[i]:len_collector[i+1]]
+        for eles in preds[:10]:
+            if eles == 'S':
+                c = c +1
+            if c>=5:
+                preds[:10] = 'S'*10
+        print(preds)
+     
+    os.remove(repo_loc+'SignalP/output/temp/temp.txt')
+    for fils in os.listdir(repo_loc+'SignalP/output/temp/pssms/'):
+        os.remove(fils)
+    for fils in os.remove(os.listdir(repo_loc+'SignalP/output/temp/prots/')):
+        os.remove(fils)
       
 else:
 

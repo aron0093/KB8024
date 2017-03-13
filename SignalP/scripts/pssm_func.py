@@ -41,7 +41,7 @@ def data_divide(filepath, outpath, divisions):
                 if not os.path.isdir(outpath + 'raw_data_'+str(k+1)+'/'):
                     raise
             for s in range(0,len(temp),2):
-                temp.iloc[s:s+2].to_csv(outpath+'raw_data_'+str(k+1)+'/'+str(re.sub('[^A-Za-z0-9]+', '', temp.iloc[s].to_string(index=False, header=False)))+'.txt', index=False, header=None)  
+                temp.iloc[s:s+2].to_csv(outpath+'raw_data_'+str(k+1)+'/'+re.sub('[^A-Za-z0-9]+', '',str(temp.iloc[s].to_string(index=False, header=False)))+'.txt', index=False, header=None)  
             i =+ 1
     
     else:
@@ -62,7 +62,7 @@ def data_divide(filepath, outpath, divisions):
                 if not os.path.isdir(outpath + 'raw_data_'+str(k+1)+'/'):
                     raise
             for s in range(0,len(temp),2):
-                temp.iloc[s:s+2].to_csv(outpath+'raw_data_'+str(k+1)+'/'+str(re.sub('[^A-Za-z0-9]+', '', temp.iloc[s].to_string(index=False, header=False)))+'.txt', index=False, header=None)  
+                temp.iloc[s:s+2].to_csv(outpath+'raw_data_'+str(k+1)+'/'+re.sub('[^A-Za-z0-9]+', '', str(temp.iloc[s].to_string(index=False, header=False)))+'.txt', index=False, header=None)  
             i += 1
             
     return
@@ -96,7 +96,7 @@ def pssm_gen_ssh(database, server_list, file_loc, outpath, username, password_lo
         
         script = open(file_loc[i]+'script.sh','w')
         
-        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 3 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'$files_'+str(i+1)+'.csv'+'\n'+'done')
+        script.write('#!/bin/bash'+'\n'+'for files in '+file_loc[i]+'*.txt'+'\n'+'do'+'\n'+'psiblast -db '+database+' -query $files -num_threads 3 -num_iterations 4 -outfmt 10 -out_ascii_pssm '+outpath+'${files##*/}_'+str(i+1)+'.csv'+'\n'+'done')
         
         script.close()
         

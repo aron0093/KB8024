@@ -12,6 +12,7 @@ def pre_vec_parser(filepath, window_size):
     # Import data as a pandas dataframe and pivot it to wide form
 
     import pandas as pd
+    import re
 
     raw_data = pd.read_csv(filepath, header=None)
 
@@ -22,19 +23,22 @@ def pre_vec_parser(filepath, window_size):
 
     raw_data[1] = pd.Series(headers*(int(len(raw_data[0])/3)))
     raw_data[2] = pd.Series(new_index)
-
+    
     data = pd.DataFrame()
     data = raw_data.pivot(index = 2, columns= 1, values = 0)
 
     pre_suf = ['B']*window_size
 
     data['Sequence_windowed'] = ''
-
+    
+        
     # Use ''.join for efficiency instead of +. Also use nested loops instead of storing variables.
 
     for i in range(0,len(data['Sequence'])):
         data['Sequence_windowed'][i] = ''.join([''.join(pre_suf), data['Sequence'][i], ''.join(pre_suf)])
 
+    data['Title'].replace(to_replace = '[^A-Za-z0-9]+', value = '', regex=True, inplace=True)
+    
     return data
 
 # Function to parse pssms
@@ -57,7 +61,7 @@ def pssm_parser(data, window_size, pssm_loc):
 
     for fil in os.listdir(pssm_loc):
         for index, prot in data['Title'].iteritems():
-            if prot[1:] == fil.partition('.')[0]:
+            if prot == fil.partition('.')[0]:
                 
                 with open(pssm_loc+fil, 'r') as f:
                      raw_file = pd.read_csv(f)
@@ -131,8 +135,7 @@ def skl_pssm_parser(data, window_size, pssm_type='freq'):
         ######## Create vector dictionary from PSSM
 
         # Using numpy arrays instead of lists to save memory.
-        X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),20
-        *frame])
+        X_ = np.zeros([(len(data['Sequence_windowed'][i])-2*window_size),20*frame])
         Y_ = np.zeros(len(data['Structure'][i])) 
             
         for j in range(window_size, (len(data['Sequence_windowed'][i])-window_size)):
