@@ -21,7 +21,7 @@ n_estimators = 10 # Number of bagging models
 filepath = repo_loc+'''data/globular_signal_tm_3state_30_slice.txt''' # Location of raw_data
 outpath = repo_loc+'SignalP/output/model/' # Location of output model
 pssm_loc = repo_loc+'SignalP/input/pssms/'
-pssm_type ='sub'
+pssm_type ='freq'
 ###### Importing the required libraries and modules ######
 
 # General Libraries
@@ -105,7 +105,7 @@ else:
   
 # Train model
 
-model = BaggingClassifier(LinearSVC(C =4, class_weight='balanced'), max_samples=1.0 / n_estimators, n_estimators=n_estimators)
+model = BaggingClassifier(LinearSVC(C =16, class_weight='balanced'), max_samples=1.0 / n_estimators, n_estimators=n_estimators)
 
 
 print("Training this magnificient model...")

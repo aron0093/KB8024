@@ -2,16 +2,22 @@
 """
 Demonstration of a SVM based predictor of signal and membrane domains created for the course 'PROJECT IN MOLECULAR LIFE SCIENCE (KB8024) 2017'. 
 
-Run this script to get predictions from any model. To train a new model see the 'model_builder.py' in 'SignalP/scripts/'.
+Run this script to get predictions using the Final_model.
 
 @author: Revant Gupta
 
 """
 ###### Enter the following parameters ######
 
-repo_loc = '''/home/u2196/Desktop/KB8024/KB8024/''' # Enter local repo location. See current version at https://github.com/aron0093/KB8024 for updates.
-#repo_loc = str(input("Enter the repository location: "))
+print(" Hi, please open the script and review the intialisation parameters to avoid uneccessary mishaps!. You need psiblast and bash available, Windows sucks!! :) ")
+
+# Enter fixed value to avoid input
+
+#repo_loc = '''/home/u2196/Desktop/KB8024/KB8024/''' # Enter local repo location. See current version at https://github.com/aron0093/KB8024 for updates.
+repo_loc = str(input("Enter the repository location: "))
+print('\n')
 test_data_gen = input("You actually want to use this to predict stuff??? Enter True for super-duper, most amazing predictions. Enter False to check my work on 50 proteins from TOPDB!: ") # Enter if test data is to be parsed.
+print('\n')
 use_pssm = True # Use pssm for test data or simple encoding, pssm prefered.
 pssm_type = 'sub'
 ###### Review following parameters ######
@@ -19,7 +25,13 @@ pssm_type = 'sub'
 filepath = repo_loc+'''data/TOPDB_50.txt''' # Location of test raw_data
 inpath = repo_loc+'SignalP/output/model/' # Location of models
 outpath = repo_loc+'SignalP/output/test_stats/' # Location of results
-database = '/local_uniref/uniref/uniref50/uniref50.db' # Psiblast database
+
+# Enter fixed value to avoid input
+
+if test_data_gen == 'True':
+    database = str(input("Enter the location of the database to run psiblast: "))
+#database = '/local_uniref/uniref/uniref50/uniref50.db' # Psiblast database
+#database = str(input("Enter the location of the database to run psiblast: "))
 
 ###### Importing the required libraries and modules ######
 
@@ -81,13 +93,9 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
 
 ###### Model selection ######
 
+model_name = 'Final_model' # Enter the desired model file
 print("\n")
-print("\n".join(map(str, os.listdir(inpath))))
-print("\n")
-
-model_name = str(input("Enter Model Name from the list above. For Final_model use the predictor script instead: ")) # Enter the desired model file
-print("\n")
-window_size = int(model_name[model_name.find('wind')+4:model_name.find('wind')+6])
+window_size = 25
 #window_size = int(input("Enter Window Size associated with model: ")) # Fixed and unchangeable depending on model
 
 ###### Data preprocessing and storage. ######
