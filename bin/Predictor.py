@@ -22,7 +22,7 @@ print('\n')
 test_data_gen = input("You actually want to use this to predict stuff??? Enter True for super-duper, most amazing predictions. Enter False to check my work on 50 proteins from TOPDB!: ") # Enter if test data is to be parsed.
 print('\n')
 use_pssm = True # Use pssm for test data or simple encoding, pssm prefered.
-pssm_type = 'sub'
+pssm_type = 'freq'
 
 ###### Review following parameters ######
 
