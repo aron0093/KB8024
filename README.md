@@ -25,7 +25,8 @@ Part of the Master's course in Molecular Techniques in Life Science at Stockholm
 *   Model is stored and can be accessed via bin. Scores and comparisons with other classifiers are available.
 
 ##OPERATIONALITY:
-*   Run SignalP_predict.py file to choose between models created in the SignalP project.
+*   Run bin/SignalP_predict.py file to choose between models created in the SignalP project.
+*   For the course submission check bin/Predictor.py
 
 ## DEVELOPMENTAL STEPS:
 *   Data parsing for defaulte encoding
