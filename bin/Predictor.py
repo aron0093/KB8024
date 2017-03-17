@@ -295,10 +295,7 @@ elif test_data_gen == 'True' or test_data_gen == 'true':
                 if preds[i+2] != 'S':
                     preds[i] = 'M'
                     preds[i+1] = 'M'
-            if preds[i:i+1] == 'MM' and preds[i-1] != 'M':
-                if preds[i+2] != 'M':
-                    preds[i] = 'G'
-                    preds[i+1] = 'G'
+
                     
         print(''.join(preds))
         
